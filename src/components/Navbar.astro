@@ -1,14 +1,42 @@
 ---
-const navItems = [
-  { href: '/', label: 'Beranda' },
-  { href: '/profil', label: 'Profil' },
-  { href: '/berita', label: 'Berita' },
-  { href: '/galeri', label: 'Galeri' },
-  { href: '/ppdb', label: 'PPDB' },
-  { href: '/kontak', label: 'Kontak' },
+// Struktur menu 2 level: `link` biasa, atau `dropdown` dengan beberapa
+// sub-halaman. Di desktop dropdown-nya buka lewat hover/focus (CSS
+// murni); di mobile sub-item-nya langsung ditampilkan mendatar di dalam
+// menu (tanpa toggle tambahan) -- lebih simpel & tetap gampang dipakai
+// jari di layar kecil.
+type NavItem = { href: string; label: string };
+type NavEntry = { type: 'link'; href: string; label: string } | { type: 'dropdown'; label: string; items: NavItem[] };
+
+const navEntries: NavEntry[] = [
+  { type: 'link', href: '/', label: 'Beranda' },
+  {
+    type: 'dropdown',
+    label: 'Profil',
+    items: [
+      { href: '/profil', label: 'Profil Sekolah' },
+      { href: '/profil/sambutan-kepala-sekolah', label: 'Sambutan Kepala Sekolah' },
+      { href: '/profil/visi-misi', label: 'Visi & Misi' },
+      { href: '/profil/struktur-organisasi', label: 'Struktur Organisasi' },
+      { href: '/profil/guru-tendik', label: 'Guru & Tenaga Kependidikan' },
+    ],
+  },
+  { type: 'link', href: '/ppdb', label: 'PPDB' },
+  {
+    type: 'dropdown',
+    label: 'Informasi',
+    items: [
+      { href: '/berita', label: 'Berita' },
+      { href: '/agenda', label: 'Agenda' },
+      { href: '/prestasi', label: 'Prestasi' },
+      { href: '/pengumuman', label: 'Pengumuman' },
+      { href: '/galeri', label: 'Galeri' },
+    ],
+  },
+  { type: 'link', href: '/kontak', label: 'Kontak' },
 ];
 
 const currentPath = Astro.url.pathname;
+const isActive = (href: string) => currentPath === href || (href !== '/' && currentPath.startsWith(href));
 ---
 
 <header class="navbar">
@@ -27,16 +55,22 @@ const currentPath = Astro.url.pathname;
 
     <nav id="navMenu" class="nav-menu">
       <ul>
-        {navItems.map((item) => (
-          <li>
-            <a
-              href={item.href}
-              class:list={['nav-link', { active: currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href)) }]}
-            >
-              {item.label}
-            </a>
-          </li>
-        ))}
+        {navEntries.map((entry) =>
+          entry.type === 'link' ? (
+            <li>
+              <a href={entry.href} class:list={['nav-link', { active: isActive(entry.href) }]}>{entry.label}</a>
+            </li>
+          ) : (
+            <li class="has-dropdown">
+              <span class:list={['nav-link', { active: entry.items.some((i) => isActive(i.href)) }]}>{entry.label} <i class="caret">▾</i></span>
+              <ul class="dropdown-menu">
+                {entry.items.map((item) => (
+                  <li><a href={item.href} class:list={['dropdown-link', { active: isActive(item.href) }]}>{item.label}</a></li>
+                ))}
+              </ul>
+            </li>
+          )
+        )}
       </ul>
     </nav>
   </div>
@@ -130,13 +164,20 @@ const currentPath = Astro.url.pathname;
   }
 
   .nav-link {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
     padding: 0.5rem 0.75rem;
     border-radius: var(--radius-sm);
     text-decoration: none;
     color: var(--ink-soft);
     font-size: 0.9375rem;
     font-weight: 500;
+    cursor: default;
+  }
+
+  a.nav-link {
+    cursor: pointer;
   }
 
   .nav-link:hover {
@@ -149,11 +190,77 @@ const currentPath = Astro.url.pathname;
     font-weight: 700;
   }
 
-  @media (max-width: 767px) {
+  .caret {
+    font-style: normal;
+    font-size: 0.7rem;
+    transition: transform 0.15s ease;
+  }
+
+  .has-dropdown {
+    position: relative;
+  }
+
+  .dropdown-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0.4rem;
+  }
+
+  .dropdown-link {
+    display: block;
+    padding: 0.5rem 0.7rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
+  .dropdown-link:hover {
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+
+  .dropdown-link.active {
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* -- Desktop: dropdown mengambang, buka lewat hover/focus -- */
+  @media (min-width: 768px) {
     .nav-toggle {
-      display: flex;
+      display: none;
     }
 
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      min-width: 15rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: 0 12px 24px -10px rgba(15, 81, 50, 0.2);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(4px);
+      transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+    }
+
+    .has-dropdown:hover .dropdown-menu,
+    .has-dropdown:focus-within .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .has-dropdown:hover .caret {
+      transform: rotate(180deg);
+    }
+  }
+
+  /* -- Mobile: menu jadi panel collapse, sub-item dropdown tampil rata (tanpa toggle) -- */
+  @media (max-width: 767px) {
     .nav-menu {
       position: absolute;
       top: 100%;
@@ -167,7 +274,8 @@ const currentPath = Astro.url.pathname;
     }
 
     .nav-menu.is-open {
-      max-height: 24rem;
+      max-height: 32rem;
+      overflow-y: auto;
     }
 
     .nav-menu ul {
@@ -179,11 +287,19 @@ const currentPath = Astro.url.pathname;
       display: block;
       padding: 0.6rem 0.5rem;
     }
-  }
 
-  @media (min-width: 768px) {
-    .nav-toggle {
+    .caret {
       display: none;
+    }
+
+    .dropdown-menu {
+      padding-left: 0.75rem;
+      border-left: 2px solid var(--primary-soft);
+      margin-left: 0.5rem;
+    }
+
+    .dropdown-link {
+      padding: 0.45rem 0.5rem;
     }
   }
 </style>

@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import ProfilTabs from '../../components/ProfilTabs.astro';
+
+// TODO: ganti dengan struktur organisasi asli sekolah.
+const struktur = [
+  { role: 'Kepala Sekolah', name: '(Nama Kepala Sekolah)' },
+  { role: 'Wakil Kepala Sekolah Bidang Kurikulum', name: '(Nama)' },
+  { role: 'Wakil Kepala Sekolah Bidang Kesiswaan', name: '(Nama)' },
+  { role: 'Kepala Tata Usaha', name: '(Nama)' },
+];
+---
+
+<BaseLayout title="Struktur Organisasi" description="Struktur organisasi SMP Negeri 20 Muaro Jambi.">
+  <PageHeader eyebrow="🏫 Tentang Kami" title="Struktur Organisasi" />
+  <ProfilTabs />
+
+  <section class="section">
+    <div class="container prose-container">
+      <div class="org-chart">
+        {struktur.map((item, i) => (
+          <div class:list={['org-box', { 'org-lead': i === 0 }]}>
+            <strong>{item.role}</strong>
+            <span>{item.name}</span>
+          </div>
+        ))}
+      </div>
+      <p class="note">Struktur lengkap beserta bagan organisasi akan diperbarui secara berkala.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .prose-container {
+    max-width: 42rem;
+  }
+
+  .org-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .org-box {
+    width: 100%;
+    max-width: 22rem;
+    text-align: center;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .org-box.org-lead {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+  }
+
+  .org-box strong {
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    color: var(--primary);
+  }
+
+  .org-box span {
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    margin-top: 0.15rem;
+  }
+
+  .note {
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 0.8125rem;
+    margin-top: 1.5rem;
+  }
+</style>

@@ -1,0 +1,63 @@
+---
+// Sub-navigasi antar halaman Profil -- ditaruh di isi halaman (bukan cuma
+// dropdown navbar) supaya tetap gampang ditemukan di layar kecil, di mana
+// dropdown navbar sering kelewat/nggak keklik.
+const tabs = [
+  { href: '/profil', label: 'Profil Sekolah' },
+  { href: '/profil/sambutan-kepala-sekolah', label: 'Sambutan Kepala Sekolah' },
+  { href: '/profil/visi-misi', label: 'Visi & Misi' },
+  { href: '/profil/struktur-organisasi', label: 'Struktur Organisasi' },
+  { href: '/profil/guru-tendik', label: 'Guru & Tendik' },
+];
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<nav class="profil-tabs" aria-label="Navigasi Profil">
+  <div class="container tabs-scroll">
+    {tabs.map((tab) => (
+      <a href={tab.href} class:list={['tab', { active: currentPath === tab.href }]}>{tab.label}</a>
+    ))}
+  </div>
+</nav>
+
+<style>
+  .profil-tabs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 68px;
+    z-index: 20;
+  }
+
+  .tabs-scroll {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-block: 0.75rem;
+    scrollbar-width: thin;
+  }
+
+  .tab {
+    flex: 0 0 auto;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .tab:hover {
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+
+  .tab.active {
+    background: var(--primary);
+    color: #fff;
+  }
+</style>

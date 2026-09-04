@@ -7,6 +7,9 @@ import { getCollection } from 'astro:content';
 const semuaBerita = await getCollection('berita', ({ data }) => !data.draft);
 const beritaTerbaru = semuaBerita.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
 
+const semuaPrestasi = await getCollection('prestasi', ({ data }) => !data.draft);
+const prestasiTerbaru = semuaPrestasi.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
+
 const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
 const highlights = [
@@ -69,6 +72,32 @@ const highlights = [
   </section>
 
   <section class="section section-alt">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">🏆 Kebanggaan</span>
+          <h2>Prestasi Terbaru</h2>
+        </div>
+        <a href="/prestasi" class="btn btn-outline">Semua Prestasi</a>
+      </div>
+
+      {prestasiTerbaru.length === 0 ? (
+        <p class="empty-note">Belum ada prestasi yang ditambahkan.</p>
+      ) : (
+        <div class="grid grid-3">
+          {prestasiTerbaru.map((item) => (
+            <a href={`/prestasi/${item.id}`} class="card news-card">
+              <span class="news-date">{item.data.level} &middot; {item.data.year}</span>
+              <h3>{item.data.title}</h3>
+              {item.data.excerpt && <p>{item.data.excerpt}</p>}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="section">
     <div class="container grid grid-3 highlight-grid">
       {highlights.map((item) => (
         <div class="card highlight-card">

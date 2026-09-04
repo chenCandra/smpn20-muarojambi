@@ -1,0 +1,21 @@
+[
+  {
+    "id": "kepala-sekolah",
+    "name": "(Nama Kepala Sekolah)",
+    "position": "Kepala Sekolah",
+    "order": 0
+  },
+  {
+    "id": "wakil-kurikulum",
+    "name": "(Nama Wakil Kepala Sekolah)",
+    "position": "Wakil Kepala Sekolah Bidang Kurikulum",
+    "order": 1
+  },
+  {
+    "id": "contoh-guru-1",
+    "name": "(Nama Guru)",
+    "position": "Guru",
+    "subject": "Matematika",
+    "order": 10
+  }
+]

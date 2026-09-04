@@ -1,0 +1,26 @@
+---
+// Header halaman generik (eyebrow + judul) -- dipakai di semua halaman
+// selain Beranda (yang punya hero sendiri lebih besar). Diekstrak jadi
+// komponen sendiri karena blok ini sebelumnya disalin-tempel di tiap
+// halaman (profil, berita, galeri, ppdb, kontak, dst).
+interface Props {
+  eyebrow: string;
+  title: string;
+}
+
+const { eyebrow, title } = Astro.props;
+---
+
+<section class="page-header">
+  <div class="container">
+    <span class="eyebrow">{eyebrow}</span>
+    <h1>{title}</h1>
+  </div>
+</section>
+
+<style>
+  .page-header {
+    background: var(--primary-soft);
+    padding-block: 3rem;
+  }
+</style>

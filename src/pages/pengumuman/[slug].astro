@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const semuaPengumuman = await getCollection('pengumuman', ({ data }) => !data.draft);
+
+  return semuaPengumuman.map((item) => ({
+    params: { slug: item.id },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+
+const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<BaseLayout title={item.data.title} description={item.data.excerpt}>
+  <article class="section">
+    <div class="container article-container">
+      <a href="/pengumuman" class="back-link">&larr; Semua Pengumuman</a>
+      <span class="article-date">{formatTanggal(item.data.pubDate)}</span>
+      <h1>{item.data.title}</h1>
+      {item.data.validUntil && <p class="valid-until">Berlaku sampai {formatTanggal(item.data.validUntil)}</p>}
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .article-container {
+    max-width: 42rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+    margin-bottom: 1rem;
+  }
+
+  .article-date {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.25rem;
+  }
+
+  .valid-until {
+    color: var(--accent);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .prose {
+    margin-top: 1.5rem;
+    font-size: 1.0625rem;
+  }
+</style>
