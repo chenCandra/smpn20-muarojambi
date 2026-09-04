@@ -1,0 +1,19 @@
+---
+// Logo placeholder -- BUKAN logo resmi sekolah (belum tersedia), cuma
+// lingkaran berisi teks "20" dengan gradasi warna brand. Ganti isi
+// komponen ini dengan <img src="/images/logo.svg" ...> begitu logo asli
+// sekolah sudah ada -- semua pemanggil komponen ini otomatis ikut update.
+interface Props {
+  size?: number;
+}
+
+const { size = 40 } = Astro.props;
+---
+
+<span
+  class="inline-flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary font-extrabold text-white shadow-md shadow-secondary/20"
+  style={`width:${size}px;height:${size}px;font-size:${size * 0.34}px`}
+  aria-hidden="true"
+>
+  20
+</span>

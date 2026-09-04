@@ -1,261 +1,152 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Mascot from '../components/Mascot.astro';
-import FloatingShapes from '../components/FloatingShapes.astro';
-import { getCollection } from 'astro:content';
+import Hero from '../components/Hero.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import FeatureCard from '../components/FeatureCard.astro';
+import StatCard from '../components/StatCard.astro';
+import NewsCard from '../components/NewsCard.astro';
+import EventTimeline from '../components/EventTimeline.astro';
+import ExtracurricularCard from '../components/ExtracurricularCard.astro';
+import TeacherCard from '../components/TeacherCard.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
+import ParentInfoCard from '../components/ParentInfoCard.astro';
+import CTASection from '../components/CTASection.astro';
+import Icon from '../components/Icon.astro';
 
-const semuaBerita = await getCollection('berita', ({ data }) => !data.draft);
-const beritaTerbaru = semuaBerita.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
+import { stats } from '../data/school';
+import { news } from '../data/news';
+import { events } from '../data/events';
+import { extracurriculars } from '../data/extracurriculars';
+import { teachers } from '../data/teachers';
+import { gallery } from '../data/gallery';
+import { fields } from '../data/fields';
 
-const semuaPrestasi = await getCollection('prestasi', ({ data }) => !data.draft);
-const prestasiTerbaru = semuaPrestasi.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
+const beritaTerbaru = [...news].sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf()).slice(0, 3);
+const agendaMendatang = [...events]
+  .filter((e) => new Date(e.date) >= new Date(new Date().toDateString()))
+  .sort((a, b) => new Date(a.date).valueOf() - new Date(b.date).valueOf())
+  .slice(0, 3);
+const guruPreview = teachers.slice(0, 4);
 
-const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
-const highlights = [
-  { emoji: '📚', title: 'Kurikulum Merdeka', text: 'Pembelajaran yang berpusat pada peserta didik, mendorong minat dan potensi setiap siswa.' },
-  { emoji: '🎨', title: 'Ekstrakurikuler', text: 'Beragam kegiatan pengembangan bakat non-akademik untuk menunjang tumbuh kembang siswa.' },
-  { emoji: '🌟', title: 'Guru Berkualitas', text: 'Tenaga pendidik profesional yang berkomitmen mendampingi proses belajar siswa.' },
+const parentInfo = [
+  { icon: 'megaphone', title: 'Pengumuman', description: 'Info terbaru untuk siswa & orang tua.', href: '/informasi#pengumuman' },
+  { icon: 'calendar', title: 'Kalender Akademik', description: 'Jadwal kegiatan sekolah satu tahun ajaran.', href: '/akademik' },
+  { icon: 'download', title: 'Download Dokumen', description: 'Formulir dan dokumen penting sekolah.', href: '/informasi#dokumen' },
+  { icon: 'book-open', title: 'Informasi Akademik', description: 'Kurikulum dan sistem pembelajaran.', href: '/akademik' },
+  { icon: 'graduation-cap', title: 'PPDB', description: 'Penerimaan Peserta Didik Baru.', href: '/informasi#ppdb' },
+  { icon: 'phone', title: 'Kontak Sekolah', description: 'Hubungi kami untuk informasi lebih lanjut.', href: '/kontak' },
 ];
 ---
 
 <BaseLayout title="Beranda">
-  <section class="hero">
-    <FloatingShapes />
-    <div class="container hero-inner">
-      <div class="hero-text">
-        <span class="eyebrow">👋 Selamat Datang</span>
-        <h1>SMP Negeri 20 Muaro Jambi</h1>
-        <p class="hero-lede">
-          Sekolah seru buat belajar, berkarya, dan berteman! Kami mewujudkan generasi yang berakhlak mulia,
-          cerdas, dan berdaya saing di Kabupaten Muaro Jambi.
-        </p>
-        <div class="hero-actions">
-          <a href="/ppdb" class="btn btn-primary">Info PPDB</a>
-          <a href="/profil" class="btn btn-outline">Profil Sekolah</a>
-        </div>
-      </div>
-      <div class="hero-mascot">
-        <Mascot size={220} />
-      </div>
-    </div>
+  <Hero />
 
-    <svg class="hero-wave" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0,32 C240,80 480,0 720,24 C960,48 1200,72 1440,24 L1440,80 L0,80 Z" fill="var(--surface)" />
-    </svg>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">📰 Berita</span>
-          <h2>Kabar Terbaru</h2>
-        </div>
-        <a href="/berita" class="btn btn-outline">Semua Berita</a>
+  <!-- Intro Sekolah -->
+  <section class="py-16 sm:py-20">
+    <div class="container-page">
+      <SectionHeading eyebrow="Tentang Kami" title="Hai! 👋 Kami SMPN 20 Muaro Jambi" />
+      <p class="reveal mt-4 max-w-2xl text-base text-ink-soft [animation-delay:80ms]">
+        SMPN 20 Muaro Jambi hadir sebagai ruang belajar tempat siswa tidak hanya belajar dari buku, tetapi juga
+        mencoba hal baru, berkolaborasi, berkarya, dan tumbuh menjadi pribadi yang percaya diri.
+      </p>
+      <div class="mt-10 grid gap-5 sm:grid-cols-3">
+        <FeatureCard icon="book-open" title="Belajar" description="Pembelajaran aktif dan bermakna." tone="primary" />
+        <FeatureCard icon="lightbulb" title="Berkarya" description="Ruang untuk kreativitas dan inovasi." tone="secondary" delay={80} />
+        <FeatureCard icon="sprout" title="Bertumbuh" description="Membangun karakter dan mempersiapkan masa depan." tone="accent" delay={160} />
       </div>
-
-      {beritaTerbaru.length === 0 ? (
-        <p class="empty-note">Belum ada berita yang diterbitkan.</p>
-      ) : (
-        <div class="grid grid-3">
-          {beritaTerbaru.map((post) => (
-            <a href={`/berita/${post.id}`} class="card news-card">
-              <span class="news-date">{formatTanggal(post.data.pubDate)}</span>
-              <h3>{post.data.title}</h3>
-              {post.data.excerpt && <p>{post.data.excerpt}</p>}
-            </a>
-          ))}
-        </div>
-      )}
     </div>
   </section>
 
-  <section class="section section-alt">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">🏆 Kebanggaan</span>
-          <h2>Prestasi Terbaru</h2>
-        </div>
-        <a href="/prestasi" class="btn btn-outline">Semua Prestasi</a>
+  <!-- Statistics -->
+  <section class="bg-gradient-to-br from-secondary to-primary-dark py-14 sm:py-16">
+    <div class="container-page grid grid-cols-2 gap-8 sm:grid-cols-4">
+      {stats.map((s) => <StatCard value={s.value} suffix={s.suffix} label={s.label} />)}
+    </div>
+  </section>
+
+  <!-- Explore Your Universe -->
+  <section class="bg-secondary-light/40 py-16 sm:py-20">
+    <div class="container-page">
+      <SectionHeading eyebrow="Minat & Bakat" title="Explore Your Universe 🚀" subtitle="Setiap siswa punya minat, bakat, dan cerita yang berbeda." align="center" />
+      <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        {fields.map((f, i) => (
+          <div class="reveal group card flex flex-col items-center gap-2 p-4 text-center transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg" style={`animation-delay:${i * 60}ms`}>
+            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-light text-primary-dark transition-transform duration-300 group-hover:scale-110">
+              <Icon name={f.icon} class="h-6 w-6" />
+            </div>
+            <h3 class="text-xs font-bold leading-tight">{f.name}</h3>
+          </div>
+        ))}
       </div>
-
-      {prestasiTerbaru.length === 0 ? (
-        <p class="empty-note">Belum ada prestasi yang ditambahkan.</p>
-      ) : (
-        <div class="grid grid-3">
-          {prestasiTerbaru.map((item) => (
-            <a href={`/prestasi/${item.id}`} class="card news-card">
-              <span class="news-date">{item.data.level} &middot; {item.data.year}</span>
-              <h3>{item.data.title}</h3>
-              {item.data.excerpt && <p>{item.data.excerpt}</p>}
-            </a>
-          ))}
-        </div>
-      )}
     </div>
   </section>
 
-  <section class="section">
-    <div class="container grid grid-3 highlight-grid">
-      {highlights.map((item) => (
-        <div class="card highlight-card">
-          <span class="highlight-emoji">{item.emoji}</span>
-          <h3>{item.title}</h3>
-          <p>{item.text}</p>
-        </div>
-      ))}
+  <!-- Berita -->
+  <section class="py-16 sm:py-20">
+    <div class="container-page">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <SectionHeading eyebrow="Info Sekolah" title="Stories from SMPN 20 📰" />
+        <a href="/berita" class="btn-outline shrink-0">Lihat Semua Berita <Icon name="arrow-right" class="h-4 w-4" /></a>
+      </div>
+      <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {beritaTerbaru.map((a) => <NewsCard article={a} />)}
+      </div>
     </div>
   </section>
+
+  <!-- Agenda -->
+  <section class="bg-bg py-16 sm:py-20">
+    <div class="container-page grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:items-start">
+      <div>
+        <SectionHeading eyebrow="Kalender" title="What's Happening? 🎉" subtitle="Ikuti terus agenda dan kegiatan sekolah kami." />
+        <a href="/kegiatan" class="btn-outline mt-6">Lihat Semua Agenda <Icon name="arrow-right" class="h-4 w-4" /></a>
+      </div>
+      <EventTimeline events={agendaMendatang} />
+    </div>
+  </section>
+
+  <!-- Ekstrakurikuler -->
+  <section class="py-16 sm:py-20">
+    <div class="container-page">
+      <SectionHeading eyebrow="Kegiatan Siswa" title="Find Your Passion ✨" subtitle="Temukan kegiatan yang membuatmu bersemangat." align="center" />
+      <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {extracurriculars.map((e, i) => <ExtracurricularCard name={e.name} icon={e.icon} description={e.description} delay={i * 50} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Guru -->
+  <section class="bg-secondary-light/40 py-16 sm:py-20">
+    <div class="container-page">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <SectionHeading eyebrow="Tim Pendidik" title="Meet Our Teachers 👋" />
+        <a href="/profil#guru" class="btn-outline shrink-0">Lihat Semua Guru <Icon name="arrow-right" class="h-4 w-4" /></a>
+      </div>
+      <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {guruPreview.map((t, i) => <TeacherCard teacher={t} delay={i * 60} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Galeri -->
+  <section class="py-16 sm:py-20">
+    <div class="container-page">
+      <SectionHeading eyebrow="Dokumentasi" title="Moments at SMPN 20 📸" align="center" />
+      <div class="mt-10">
+        <GalleryGrid photos={gallery} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Informasi Penting (untuk orang tua) -->
+  <section class="bg-bg py-16 sm:py-20">
+    <div class="container-page">
+      <SectionHeading eyebrow="Untuk Orang Tua & Wali" title="Informasi Penting" subtitle="Akses cepat ke informasi yang sering dicari." />
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {parentInfo.map((p, i) => <ParentInfoCard icon={p.icon} title={p.title} description={p.description} href={p.href} delay={i * 50} />)}
+      </div>
+    </div>
+  </section>
+
+  <CTASection />
 </BaseLayout>
-
-<style>
-  .hero {
-    position: relative;
-    background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: #fff;
-    padding-block: 4rem 5.5rem;
-    overflow: hidden;
-  }
-
-  .hero-inner {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .hero-text {
-    max-width: 34rem;
-    flex: 1 1 20rem;
-  }
-
-  .hero h1 {
-    font-size: clamp(1.85rem, 4vw, 2.75rem);
-    color: #fff;
-  }
-
-  .hero-lede {
-    color: #dcebe3;
-    font-size: 1.0625rem;
-  }
-
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-  }
-
-  .hero .btn-outline {
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.6);
-  }
-
-  .hero .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.12);
-  }
-
-  .hero-mascot {
-    flex: 0 0 auto;
-    filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.2));
-  }
-
-  @media (max-width: 640px) {
-    .hero-mascot {
-      width: 9rem;
-      margin-inline: auto;
-    }
-  }
-
-  .hero-wave {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -1px;
-    width: 100%;
-    height: 48px;
-    display: block;
-  }
-
-  .section-head {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 1rem;
-    margin-bottom: 1.75rem;
-  }
-
-  .section-head h2 {
-    margin: 0;
-  }
-
-  .news-card {
-    display: block;
-    padding: 1.25rem;
-    text-decoration: none;
-    color: var(--ink);
-    height: 100%;
-  }
-
-  .news-date {
-    font-size: 0.8125rem;
-    color: var(--ink-faint);
-  }
-
-  .news-card h3 {
-    font-size: 1.0625rem;
-    margin: 0.4rem 0 0.4rem;
-  }
-
-  .news-card p {
-    font-size: 0.9375rem;
-    color: var(--ink-soft);
-    margin: 0;
-  }
-
-  .empty-note {
-    color: var(--ink-soft);
-  }
-
-  .highlight-card {
-    padding: 1.5rem;
-    text-align: center;
-  }
-
-  .highlight-emoji {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 3.25rem;
-    height: 3.25rem;
-    border-radius: 50%;
-    background: var(--accent-soft);
-    font-size: 1.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .highlight-card:nth-child(2) .highlight-emoji {
-    background: var(--accent2-soft);
-  }
-
-  .highlight-card:nth-child(3) .highlight-emoji {
-    background: var(--accent3-soft);
-  }
-
-  .highlight-card h3 {
-    color: var(--primary);
-    font-size: 1.0625rem;
-  }
-
-  .highlight-card p {
-    color: var(--ink-soft);
-    font-size: 0.9375rem;
-    margin: 0;
-  }
-</style>

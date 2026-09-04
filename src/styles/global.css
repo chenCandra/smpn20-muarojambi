@@ -1,210 +1,143 @@
-/* Design tokens -- palet hijau tetap jadi identitas utama (institusional,
-   umum dipakai sekolah negeri), tapi dicerahkan + ditambah aksen oranye/biru
-   yang lebih riang, ditujukan buat audiens siswa SMP (bukan cuma orang
-   tua/dinas yang baca situs sekolah). Ganti nilai di sini kalau sekolah
-   punya warna seragam/almamater resmi yang beda. */
-:root {
-  --primary: #1a8a54;
-  --primary-dark: #0f5132;
-  --primary-soft: #e5f7ec;
+@import "tailwindcss";
 
-  --accent: #ff8a3d;
-  --accent-soft: #fff1e2;
+/* ==========================================================================
+   Design tokens -- Tailwind v4 CSS-first config (bukan tailwind.config.js).
+   Palet sesuai spesifikasi: Sky Blue (primary) + Indigo (secondary) + Yellow
+   & Orange (accent), dipakai proporsional -- BUKAN seluruh halaman warna-
+   warni. Konsep: 70% modern school, 20% youthful/playful, 10% science/space.
+   ========================================================================== */
+@theme {
+  --color-primary: #38bdf8;
+  --color-primary-dark: #0284c7;
+  --color-primary-light: #e0f4fe;
 
-  --accent2: #2fb6e0;
-  --accent2-soft: #e3f6fc;
+  --color-secondary: #6366f1;
+  --color-secondary-dark: #4338ca;
+  --color-secondary-light: #e8e8fd;
 
-  --accent3: #ff6f91;
-  --accent3-soft: #ffe9ee;
+  --color-accent: #facc15;
+  --color-accent-dark: #ca8a04;
+  --color-accent-light: #fef9e5;
 
-  --ink: #1c2620;
-  --ink-soft: #536057;
-  --ink-faint: #8fa198;
+  --color-accent2: #fb923c;
+  --color-accent2-dark: #c2600f;
+  --color-accent2-light: #fff1e5;
 
-  --surface: #ffffff;
-  --surface-alt: #f5faf7;
-  --border: #e0ebe4;
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-ink: #172033;
+  --color-ink-soft: #4b5566;
+  --color-ink-faint: #8894a3;
+  --color-border: #e3e8ef;
 
-  --radius-sm: 0.6rem;
-  --radius-md: 1.1rem;
-  --radius-lg: 1.75rem;
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 
-  /* Baloo 2 -- font bulat & tebal, kesan ceria/ramah anak, dipakai buat
-     judul. Nunito -- sans rounded juga tapi lebih netral, tetap enak dibaca
-     panjang buat isi paragraf. Dua-duanya dari Google Fonts (di-load di
-     BaseLayout). */
-  --font-body: 'Nunito', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Baloo 2', ui-sans-serif, system-ui, sans-serif;
+  /* Card utama pakai radius 16-28px sesuai spek -- token "card" (20px) jadi
+     default, "card-lg" (28px) buat elemen besar seperti hero image/CTA. */
+  --radius-card: 20px;
+  --radius-card-lg: 28px;
 
-  --max-width: 72rem;
+  --animate-float: float 5s ease-in-out infinite;
+  --animate-float-slow: float 7s ease-in-out infinite;
+  --animate-spin-slow: spin-slow 18s linear infinite;
+  --animate-twinkle: twinkle 3s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+  }
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--ink);
-  background: var(--surface);
-  overflow-x: hidden; /* biar dekorasi mengambang yang sengaja "nyeruduk" tepi layar nggak bikin scrollbar horizontal */
-}
-
-img {
-  max-width: 100%;
-  display: block;
-}
-
-a {
-  color: var(--primary);
-}
-
-h1, h2, h3, h4 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0 0 0.5em;
-}
-
-p {
-  margin: 0 0 1em;
-}
-
-.container {
-  width: 100%;
-  max-width: var(--max-width);
-  margin-inline: auto;
-  padding-inline: 1.25rem;
-}
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-a.card:hover,
-.card.is-hoverable:hover {
-  transform: translateY(-4px) rotate(-0.5deg);
-  box-shadow: 0 14px 30px -12px rgba(15, 81, 50, 0.25);
-  border-color: var(--primary);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.7rem 1.4rem;
-  border-radius: 999px;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.9375rem;
-  text-decoration: none;
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.btn:hover {
-  transform: translateY(-2px) scale(1.03);
-}
-
-.btn:active {
-  transform: scale(0.96);
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-  box-shadow: 0 6px 16px -6px rgba(26, 138, 84, 0.55);
-}
-
-.btn-primary:hover {
-  background: var(--primary-dark);
-  color: #fff;
-}
-
-.btn-outline {
-  background: transparent;
-  color: var(--primary);
-  border-color: var(--primary);
-}
-
-.btn-outline:hover {
-  background: var(--primary-soft);
-}
-
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.8125rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent);
-  margin-bottom: 0.5rem;
-}
-
-.section {
-  padding-block: 3.5rem;
-  position: relative;
-}
-
-.section-alt {
-  background: var(--surface-alt);
-}
-
-.grid {
-  display: grid;
-  gap: 1.5rem;
-}
-
-@media (min-width: 640px) {
-  .grid-2 { grid-template-columns: repeat(2, 1fr); }
-  .grid-3 { grid-template-columns: repeat(3, 1fr); }
-}
-
-/* -- Animasi dekoratif reusable, dipakai maskot & bentuk-bentuk mengambang -- */
-
-@keyframes bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes float-drift {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(6px, -14px) rotate(8deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
-}
-
-@keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-4deg); }
-  75% { transform: rotate(4deg); }
-}
-
-@keyframes wave-arm {
-  0%, 100% { transform: rotate(0deg); }
-  20% { transform: rotate(22deg); }
-  40% { transform: rotate(2deg); }
-  60% { transform: rotate(22deg); }
-  80% { transform: rotate(0deg); }
-}
-
+/* prefers-reduced-motion -- dihormati secara global (butir 21/35 spek):
+   semua animasi dekoratif (float/spin/twinkle) & transisi dimatikan buat
+   pengguna yang browser/OS-nya minta lebih sedikit gerakan. */
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.001ms !important;
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-sans font-extrabold tracking-tight text-ink;
+  }
+
+  /* Focus state jelas & konsisten di semua elemen interaktif (butir 21) --
+     dipakai lewat :focus-visible biar nggak muncul cuma karena diklik
+     mouse, hanya saat navigasi keyboard. */
+  a:focus-visible,
+  button:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid var(--color-secondary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8;
+  }
+
+  /* Tailwind v4 nggak bisa @apply satu custom component class DI DALAM
+     custom component class lain (cuma boleh @apply utility Tailwind asli) --
+     jadi base style tombol ditulis lengkap di tiap varian (bukan di-compose
+     lewat @apply btn), meski jadinya sedikit berulang. `.btn` sendiri tetap
+     ada buat dipakai bareng utility Tailwind langsung di HTML (itu BUKAN
+     @apply-chaining, jadi aman) -- lihat pemakaiannya di Hero.astro. */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold transition-transform duration-200 active:scale-95;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white transition-transform duration-200 active:scale-95 bg-secondary shadow-lg shadow-secondary/25 hover:-translate-y-0.5 hover:bg-secondary-dark;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold transition-transform duration-200 active:scale-95 border-2 border-secondary/30 bg-white text-secondary hover:-translate-y-0.5 hover:border-secondary hover:bg-secondary-light;
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold transition-transform duration-200 active:scale-95 bg-accent text-ink shadow-lg shadow-accent/30 hover:-translate-y-0.5 hover:bg-accent-dark hover:text-white;
+  }
+
+  .card {
+    @apply rounded-[var(--radius-card)] border border-border bg-surface shadow-sm shadow-slate-200/60;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide;
+  }
+
+  /* Reveal-on-scroll -- IntersectionObserver (lihat assets/js/reveal.js)
+     nambah class .is-visible saat elemen masuk viewport; sebelum itu
+     elemen ditahan sedikit di bawah + transparan (fade-up halus). */
+  .reveal {
+    @apply translate-y-4 opacity-0 transition-all duration-700 ease-out;
+  }
+
+  .reveal.is-visible {
+    @apply translate-y-0 opacity-100;
   }
 }

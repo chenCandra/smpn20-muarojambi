@@ -1,0 +1,28 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  icon: string;
+  title: string;
+  description: string;
+  href: string;
+  delay?: number;
+}
+
+const { icon, title, description, href, delay = 0 } = Astro.props;
+---
+
+<a
+  href={href}
+  class="reveal group flex items-start gap-4 rounded-2xl border border-border bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
+  style={`animation-delay:${delay}ms`}
+>
+  <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-light text-primary-dark">
+    <Icon name={icon} class="h-5 w-5" />
+  </div>
+  <div class="min-w-0">
+    <h3 class="text-sm font-bold">{title}</h3>
+    <p class="mt-0.5 text-sm text-ink-soft">{description}</p>
+  </div>
+  <Icon name="chevron-right" class="ml-auto h-4 w-4 shrink-0 self-center text-ink-faint transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+</a>

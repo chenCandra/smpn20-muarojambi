@@ -1,0 +1,37 @@
+---
+import Icon from './Icon.astro';
+import type { SchoolEvent } from '../data/events';
+
+interface Props {
+  events: SchoolEvent[];
+}
+
+const { events } = Astro.props;
+
+const sorted = [...events].sort((a, b) => new Date(a.date).valueOf() - new Date(b.date).valueOf());
+const bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+---
+
+<ol class="flex flex-col gap-4">
+  {sorted.map((event, i) => {
+    const d = new Date(event.date);
+    return (
+      <li class="reveal card flex gap-4 p-4 sm:p-5" style={`animation-delay:${i * 70}ms`}>
+        <div class="flex w-16 shrink-0 flex-col items-center justify-center rounded-2xl bg-primary-light text-primary-dark">
+          <span class="text-xl font-extrabold leading-none">{d.getDate()}</span>
+          <span class="text-[11px] font-bold uppercase tracking-wide">{bulan[d.getMonth()]}</span>
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-base">{event.title}</h3>
+          {event.location && (
+            <p class="mt-1 flex items-center gap-1.5 text-xs font-medium text-ink-faint">
+              <Icon name="map-pin" class="h-3.5 w-3.5" />
+              {event.location}
+            </p>
+          )}
+          {event.description && <p class="mt-1.5 text-sm text-ink-soft">{event.description}</p>}
+        </div>
+      </li>
+    );
+  })}
+</ol>

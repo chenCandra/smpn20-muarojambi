@@ -1,0 +1,23 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  name: string;
+  icon: string;
+  description?: string;
+  delay?: number;
+}
+
+const { name, icon, description, delay = 0 } = Astro.props;
+---
+
+<div
+  class="reveal card group flex flex-col items-center gap-2.5 p-5 text-center transition-all duration-300 hover:-translate-y-1.5 hover:border-secondary/30 hover:shadow-lg"
+  style={`animation-delay:${delay}ms`}
+>
+  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-secondary-light text-secondary transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110">
+    <Icon name={icon} class="h-7 w-7" />
+  </div>
+  <h3 class="text-sm font-bold">{name}</h3>
+  {description && <p class="text-xs text-ink-soft">{description}</p>}
+</div>

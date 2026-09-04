@@ -1,0 +1,110 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ParentInfoCard from '../components/ParentInfoCard.astro';
+import Icon from '../components/Icon.astro';
+import { news } from '../data/news';
+import { school } from '../data/school';
+
+const pengumuman = news.filter((n) => n.category === 'Pengumuman').sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf());
+
+const parentInfo = [
+  { icon: 'megaphone', title: 'Pengumuman', description: 'Info terbaru untuk siswa & orang tua.', href: '#pengumuman' },
+  { icon: 'calendar', title: 'Kalender Akademik', description: 'Jadwal kegiatan sekolah satu tahun ajaran.', href: '/akademik' },
+  { icon: 'download', title: 'Download Dokumen', description: 'Formulir dan dokumen penting sekolah.', href: '#dokumen' },
+  { icon: 'book-open', title: 'Informasi Akademik', description: 'Kurikulum dan sistem pembelajaran.', href: '/akademik' },
+  { icon: 'graduation-cap', title: 'PPDB', description: 'Penerimaan Peserta Didik Baru.', href: '#ppdb' },
+  { icon: 'phone', title: 'Kontak Sekolah', description: 'Hubungi kami untuk informasi lebih lanjut.', href: '/kontak' },
+];
+
+const dokumen = [
+  { name: 'Formulir Pendaftaran PPDB', href: '#' },
+  { name: 'Tata Tertib Sekolah', href: '#' },
+  { name: 'Kalender Pendidikan', href: '#' },
+];
+
+const syaratPpdb = [
+  'Fotokopi Kartu Keluarga (KK)',
+  'Fotokopi Akta Kelahiran',
+  'Ijazah/Surat Keterangan Lulus SD/sederajat',
+  'Pas foto terbaru',
+];
+---
+
+<BaseLayout title="Informasi" description={`Informasi penting untuk orang tua/wali murid ${school.fullName}.`}>
+  <section class="bg-gradient-to-br from-accent-light/70 to-primary-light/60 pb-16 pt-16 sm:pt-20">
+    <div class="container-page reveal">
+      <span class="badge bg-white text-accent-dark shadow-sm">Untuk Orang Tua & Wali</span>
+      <h1 class="mt-4 text-3xl sm:text-4xl">Informasi Penting</h1>
+      <p class="mt-3 max-w-xl text-ink-soft">Akses cepat ke informasi yang sering dicari orang tua dan wali murid.</p>
+    </div>
+  </section>
+
+  <section class="py-16 sm:py-20">
+    <div class="container-page grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {parentInfo.map((p, i) => <ParentInfoCard icon={p.icon} title={p.title} description={p.description} href={p.href} delay={i * 50} />)}
+    </div>
+  </section>
+
+  <section id="pengumuman" class="scroll-mt-20 bg-secondary-light/40 py-16 sm:py-20">
+    <div class="container-page">
+      <SectionHeading eyebrow="📢 Informasi" title="Pengumuman" />
+      <div class="mt-8 flex flex-col gap-3">
+        {pengumuman.length === 0 ? (
+          <p class="text-sm text-ink-soft">Belum ada pengumuman.</p>
+        ) : (
+          pengumuman.map((p, i) => (
+            <a href={`/berita/${p.slug}`} class="reveal card flex items-center gap-4 p-4" style={`animation-delay:${i * 60}ms`}>
+              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent2-light text-accent2-dark"><Icon name="megaphone" class="h-5 w-5" /></div>
+              <div class="min-w-0">
+                <p class="text-sm font-bold">{p.title}</p>
+                <p class="text-xs text-ink-faint">{new Date(p.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+              </div>
+              <Icon name="chevron-right" class="ml-auto h-4 w-4 shrink-0 text-ink-faint" />
+            </a>
+          ))
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section id="ppdb" class="scroll-mt-20 py-16 sm:py-20">
+    <div class="container-page grid gap-10 lg:grid-cols-2">
+      <div class="reveal">
+        <SectionHeading eyebrow="🎓 Pendaftaran" title="Penerimaan Peserta Didik Baru (PPDB)" />
+        <!-- TODO: ganti seluruh isi bagian ini dengan jadwal & syarat PPDB yang sebenarnya. -->
+        <p class="mt-4 text-sm text-ink-soft">
+          Jadwal dan alur pendaftaran PPDB tahun ajaran berjalan akan diumumkan di halaman ini. Silakan pantau
+          secara berkala, atau hubungi sekolah langsung untuk informasi terbaru.
+        </p>
+        <p class="mt-3 text-sm text-ink-soft">
+          Mengikuti ketentuan Sistem Penerimaan Murid Baru (SPMB) yang ditetapkan Pemerintah Kabupaten/Provinsi,
+          umumnya meliputi jalur zonasi, afirmasi, perpindahan tugas orang tua, dan prestasi.
+        </p>
+        <a href="/kontak" class="btn-primary mt-6">Hubungi Sekolah <Icon name="arrow-right" class="h-4 w-4" /></a>
+      </div>
+      <div class="reveal card p-6 [animation-delay:100ms]">
+        <h3 class="text-base font-bold">Syarat Umum Pendaftaran</h3>
+        <ul class="mt-3 space-y-2 text-sm text-ink-soft">
+          {syaratPpdb.map((s) => <li class="flex gap-2"><Icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-primary" />{s}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="dokumen" class="scroll-mt-20 bg-secondary-light/40 py-16 sm:py-20">
+    <div class="container-page">
+      <SectionHeading eyebrow="📄 Unduhan" title="Download Dokumen" />
+      <div class="mt-8 grid gap-3 sm:grid-cols-3">
+        {dokumen.map((d, i) => (
+          <a href={d.href} class="reveal card flex items-center gap-3 p-4" style={`animation-delay:${i * 60}ms`}>
+            <Icon name="file" class="h-5 w-5 shrink-0 text-secondary" />
+            <span class="text-sm font-semibold">{d.name}</span>
+            <Icon name="download" class="ml-auto h-4 w-4 shrink-0 text-ink-faint" />
+          </a>
+        ))}
+      </div>
+      <p class="reveal mt-5 text-xs text-ink-faint">Dokumen di atas placeholder -- unggah file asli ke <code>public/documents/</code> lalu perbarui tautannya.</p>
+    </div>
+  </section>
+</BaseLayout>

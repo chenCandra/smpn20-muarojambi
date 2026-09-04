@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import TeacherCard from '../components/TeacherCard.astro';
+import Icon from '../components/Icon.astro';
+import { school } from '../data/school';
+import { teachers } from '../data/teachers';
+
+const misi = [
+  'Menyelenggarakan pembelajaran yang aktif, kreatif, dan menyenangkan.',
+  'Membina karakter siswa melalui keteladanan dan pembiasaan.',
+  'Mengembangkan bakat dan minat siswa melalui kegiatan ekstrakurikuler.',
+  'Menumbuhkan semangat gotong royong dan kepedulian sosial.',
+];
+
+const struktur = [
+  { role: 'Kepala Sekolah', name: school.principalName },
+  { role: 'Wakil Kepala Sekolah Bidang Kurikulum', name: '[Nama]' },
+  { role: 'Wakil Kepala Sekolah Bidang Kesiswaan', name: '[Nama]' },
+  { role: 'Kepala Tata Usaha', name: '[Nama]' },
+];
+---
+
+<BaseLayout title="Profil" description={`Profil, visi misi, dan struktur organisasi ${school.fullName}.`}>
+  <section class="bg-gradient-to-br from-secondary-light/60 to-primary-light/60 pb-16 pt-16 sm:pt-20">
+    <div class="container-page reveal">
+      <span class="badge bg-white text-secondary shadow-sm">Tentang Kami</span>
+      <h1 class="mt-4 text-3xl sm:text-4xl">Profil Sekolah</h1>
+      <p class="mt-3 max-w-xl text-ink-soft">Kenali lebih dekat SMPN 20 Muaro Jambi -- identitas, visi misi, dan orang-orang di baliknya.</p>
+    </div>
+  </section>
+
+  <section class="py-16 sm:py-20">
+    <div class="container-page grid gap-12 lg:grid-cols-2">
+      <div class="reveal">
+        <h2 class="text-2xl">Sekilas {school.fullName}</h2>
+        <p class="mt-3 text-ink-soft">
+          <!-- TODO: lengkapi dengan sejarah singkat sekolah yang sebenarnya. -->
+          {school.fullName} adalah sekolah menengah pertama negeri yang berlokasi di Kabupaten Muaro Jambi,
+          Provinsi Jambi. Sekolah ini berkomitmen menyelenggarakan pendidikan yang berkualitas, membentuk
+          karakter siswa yang berakhlak mulia, serta mengembangkan potensi akademik dan non-akademik setiap
+          peserta didik.
+        </p>
+        <dl class="mt-6 space-y-2 text-sm">
+          <div class="flex gap-2"><dt class="w-28 shrink-0 font-semibold text-ink-faint">NPSN</dt><dd>{school.npsn}</dd></div>
+          <div class="flex gap-2"><dt class="w-28 shrink-0 font-semibold text-ink-faint">Status</dt><dd>Negeri</dd></div>
+          <div class="flex gap-2"><dt class="w-28 shrink-0 font-semibold text-ink-faint">Alamat</dt><dd>{school.address}, {school.city}, {school.province}</dd></div>
+        </dl>
+      </div>
+
+      <div class="reveal card p-6 [animation-delay:100ms]">
+        <h2 class="text-lg">Sambutan Kepala Sekolah</h2>
+        <!-- TODO: ganti dengan sambutan asli. -->
+        <p class="mt-3 text-sm italic text-ink-soft">"Assalamu'alaikum warahmatullahi wabarakatuh,"</p>
+        <p class="mt-2 text-sm text-ink-soft">
+          Selamat datang di situs resmi {school.fullName}. Kami berkomitmen untuk terus meningkatkan kualitas
+          pendidikan, membentuk karakter siswa yang berakhlak mulia, serta mengembangkan potensi akademik dan
+          non-akademik setiap peserta didik.
+        </p>
+        <p class="mt-4 text-sm font-bold text-ink">{school.principalName}</p>
+        <p class="text-xs text-ink-faint">Kepala {school.fullName}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-secondary-light/40 py-16 sm:py-20">
+    <div class="container-page grid gap-6 sm:grid-cols-2">
+      <div class="reveal card p-6">
+        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-light text-primary-dark"><Icon name="rocket" class="h-5 w-5" /></div>
+        <h2 class="mt-3 text-lg">Visi</h2>
+        <!-- TODO: ganti dengan visi resmi sekolah. -->
+        <p class="mt-2 text-sm text-ink-soft">Terwujudnya peserta didik yang beriman, berakhlak mulia, cerdas, dan berdaya saing di era global.</p>
+      </div>
+      <div class="reveal card p-6 [animation-delay:80ms]">
+        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary-light text-secondary"><Icon name="sparkle" class="h-5 w-5" /></div>
+        <h2 class="mt-3 text-lg">Misi</h2>
+        <ol class="mt-2 space-y-1.5 text-sm text-ink-soft">
+          <!-- TODO: ganti dengan misi resmi sekolah. -->
+          {misi.map((m) => <li class="flex gap-2"><Icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-primary" />{m}</li>)}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 sm:py-20">
+    <div class="container-page">
+      <SectionHeading eyebrow="Organisasi" title="Struktur Organisasi" align="center" />
+      <div class="mx-auto mt-10 flex max-w-md flex-col items-center gap-3">
+        {struktur.map((item, i) => (
+          <div class:list={['reveal w-full rounded-2xl border p-4 text-center', i === 0 ? 'border-primary bg-primary-light' : 'border-border bg-white']} style={`animation-delay:${i * 70}ms`}>
+            <p class="text-sm font-bold text-primary-dark">{item.role}</p>
+            <p class="text-sm text-ink-soft">{item.name}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="guru" class="scroll-mt-20 bg-secondary-light/40 py-16 sm:py-20">
+    <div class="container-page">
+      <SectionHeading eyebrow="Tim Pendidik" title="Guru & Tenaga Kependidikan" align="center" />
+      <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {teachers.map((t, i) => <TeacherCard teacher={t} delay={i * 50} />)}
+      </div>
+      <p class="reveal mt-8 text-center text-xs text-ink-faint">Data di atas contoh/placeholder -- lengkapi lewat berkas <code>src/data/teachers.ts</code>.</p>
+    </div>
+  </section>
+</BaseLayout>

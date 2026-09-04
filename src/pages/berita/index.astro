@@ -1,75 +1,69 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import NewsCard from '../../components/NewsCard.astro';
+import { news, type NewsCategory } from '../../data/news';
+import { school } from '../../data/school';
 
-const semuaBerita = await getCollection('berita', ({ data }) => !data.draft);
-const berita = semuaBerita.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-
-const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+const kategoriList: NewsCategory[] = ['Prestasi', 'Akademik', 'Kegiatan', 'Pengumuman', 'Sekolah'];
+const artikel = [...news].sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf());
 ---
 
-<BaseLayout title="Berita" description="Kabar dan kegiatan terbaru dari SMP Negeri 20 Muaro Jambi.">
-  <section class="page-header">
-    <div class="container">
-      <span class="eyebrow">Informasi</span>
-      <h1>Berita</h1>
+<BaseLayout title="Berita" description={`Berita dan kabar terbaru ${school.fullName}.`}>
+  <section class="bg-gradient-to-br from-primary-light/70 to-secondary-light/60 pb-16 pt-16 sm:pt-20">
+    <div class="container-page reveal">
+      <span class="badge bg-white text-primary-dark shadow-sm">Info Sekolah</span>
+      <h1 class="mt-4 text-3xl sm:text-4xl">Stories from SMPN 20 📰</h1>
+      <p class="mt-3 max-w-xl text-ink-soft">Kumpulan berita, kegiatan, dan pengumuman terbaru seputar sekolah.</p>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container">
-      {berita.length === 0 ? (
-        <p class="empty-note">Belum ada berita yang diterbitkan.</p>
-      ) : (
-        <div class="grid grid-3">
-          {berita.map((post) => (
-            <a href={`/berita/${post.id}`} class="card news-card">
-              <span class="news-date">{formatTanggal(post.data.pubDate)}</span>
-              <h2>{post.data.title}</h2>
-              {post.data.excerpt && <p>{post.data.excerpt}</p>}
-            </a>
-          ))}
-        </div>
-      )}
+  <section class="py-16 sm:py-20">
+    <div class="container-page">
+      <!-- Filter kategori CLIENT-SIDE (bukan query-param server) -- situs
+           ini statis, tidak ada server buat memproses ?kategori=...,
+           jadi filternya cukup show/hide kartu lewat JS begitu tombol
+           diklik, tanpa reload halaman. -->
+      <div id="filterBar" class="reveal flex flex-wrap gap-2">
+        <button type="button" data-filter="Semua" class="badge is-active bg-secondary text-white transition-colors">Semua</button>
+        {kategoriList.map((k) => (
+          <button type="button" data-filter={k} class="badge border border-border bg-white text-ink-soft transition-colors hover:border-secondary/40">{k}</button>
+        ))}
+      </div>
+
+      <div id="newsGrid" class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {artikel.map((a) => (
+          <div data-category={a.category}>
+            <NewsCard article={a} />
+          </div>
+        ))}
+      </div>
+      <p id="emptyNote" class="mt-10 hidden text-sm text-ink-soft">Belum ada berita pada kategori ini.</p>
     </div>
   </section>
 </BaseLayout>
 
-<style>
-  .page-header {
-    background: var(--primary-soft);
-    padding-block: 3rem;
-  }
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('#filterBar [data-filter]');
+  const items = document.querySelectorAll<HTMLElement>('#newsGrid [data-category]');
+  const emptyNote = document.getElementById('emptyNote');
 
-  .news-card {
-    display: block;
-    padding: 1.25rem;
-    text-decoration: none;
-    color: var(--ink);
-    height: 100%;
-  }
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      buttons.forEach((b) => {
+        b.classList.remove('is-active', 'bg-secondary', 'text-white');
+        b.classList.add('border', 'border-border', 'bg-white', 'text-ink-soft');
+      });
+      btn.classList.add('is-active', 'bg-secondary', 'text-white');
+      btn.classList.remove('border', 'border-border', 'bg-white', 'text-ink-soft');
 
-  .news-card:hover {
-    border-color: var(--primary);
-  }
-
-  .news-date {
-    font-size: 0.8125rem;
-    color: var(--ink-faint);
-  }
-
-  .news-card h2 {
-    font-size: 1.0625rem;
-    margin: 0.4rem 0 0.4rem;
-  }
-
-  .news-card p {
-    font-size: 0.9375rem;
-    color: var(--ink-soft);
-    margin: 0;
-  }
-
-  .empty-note {
-    color: var(--ink-soft);
-  }
-</style>
+      const filter = btn.dataset.filter;
+      let visibleCount = 0;
+      items.forEach((item) => {
+        const match = filter === 'Semua' || item.dataset.category === filter;
+        item.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+      emptyNote?.classList.toggle('hidden', visibleCount > 0);
+    });
+  });
+</script>

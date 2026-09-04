@@ -1,97 +1,81 @@
 ---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { school } from '../data/school';
+
 const year = new Date().getFullYear();
+
+const menu = [
+  { href: '/profil', label: 'Profil' },
+  { href: '/akademik', label: 'Akademik' },
+  { href: '/kegiatan', label: 'Kegiatan' },
+  { href: '/berita', label: 'Berita' },
+  { href: '/informasi', label: 'Informasi' },
+  { href: '/kontak', label: 'Kontak' },
+];
+
+const socialLinks = [
+  { key: 'instagram', href: school.social.instagram },
+  { key: 'facebook', href: school.social.facebook },
+  { key: 'youtube', href: school.social.youtube },
+  { key: 'tiktok', href: school.social.tiktok },
+].filter((s) => s.href);
 ---
 
-<footer class="footer">
-  <div class="container footer-grid">
-    <div>
-      <strong class="footer-brand">SMP Negeri 20 Muaro Jambi</strong>
-      <p class="footer-address">
-        Kabupaten Muaro Jambi, Provinsi Jambi<br>
-        Email: info@smpn20muarojambi.sch.id
+<footer class="bg-ink text-slate-300">
+  <div class="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="lg:col-span-2">
+      <a href="/" class="flex items-center gap-2.5">
+        <Logo size={38} />
+        <span class="flex flex-col leading-tight">
+          <span class="text-sm font-extrabold text-white">{school.fullName}</span>
+          <span class="text-xs font-medium text-secondary-light/80">{school.tagline}</span>
+        </span>
+      </a>
+      <p class="mt-4 max-w-sm text-sm text-slate-400">
+        Sekolah tempat siswa belajar, berkarya, menemukan potensi, dan mempersiapkan diri untuk masa depan.
       </p>
+      {socialLinks.length > 0 && (
+        <div class="mt-5 flex gap-2">
+          {socialLinks.map((s) => (
+            <a
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={s.key}
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-primary"
+            >
+              <Icon name={s.key} class="h-4 w-4" />
+            </a>
+          ))}
+        </div>
+      )}
     </div>
+
     <div>
-      <strong>Tautan</strong>
-      <ul class="footer-links">
-        <li><a href="/profil">Profil Sekolah</a></li>
-        <li><a href="/ppdb">Penerimaan Siswa Baru</a></li>
-        <li><a href="/berita">Berita</a></li>
-        <li><a href="/kontak">Kontak</a></li>
+      <h3 class="text-sm font-bold uppercase tracking-wide text-white">Informasi Kontak</h3>
+      <ul class="mt-4 space-y-3 text-sm">
+        <li class="flex gap-2.5"><Icon name="map-pin" class="h-4 w-4 shrink-0 text-primary" /><span>{school.address}, {school.city}, {school.province}</span></li>
+        <li class="flex gap-2.5"><Icon name="phone" class="h-4 w-4 shrink-0 text-primary" /><span>{school.phone}</span></li>
+        <li class="flex gap-2.5"><Icon name="mail" class="h-4 w-4 shrink-0 text-primary" /><span>{school.email}</span></li>
+        <li class="flex gap-2.5"><Icon name="external-link" class="h-4 w-4 shrink-0 text-primary" /><span>{school.website.replace('https://', '')}</span></li>
       </ul>
     </div>
+
     <div>
-      <strong>Informasi</strong>
-      <ul class="footer-links">
-        <li><a href="/agenda">Agenda</a></li>
-        <li><a href="/prestasi">Prestasi</a></li>
-        <li><a href="/pengumuman">Pengumuman</a></li>
-        <li><a href="/galeri">Galeri</a></li>
+      <h3 class="text-sm font-bold uppercase tracking-wide text-white">Menu</h3>
+      <ul class="mt-4 space-y-3 text-sm">
+        {menu.map((item) => (
+          <li><a href={item.href} class="transition-colors hover:text-white">{item.label}</a></li>
+        ))}
       </ul>
     </div>
   </div>
-  <div class="container footer-bottom">
-    <span>&copy; {year} SMP Negeri 20 Muaro Jambi. Hak cipta dilindungi.</span>
+
+  <div class="border-t border-white/10">
+    <div class="container-page flex flex-col items-center justify-between gap-2 py-5 text-xs text-slate-500 sm:flex-row">
+      <span>&copy; {year} {school.fullName}. Hak cipta dilindungi.</span>
+      <span>{school.tagline}</span>
+    </div>
   </div>
 </footer>
-
-<style>
-  .footer {
-    background: var(--primary-dark);
-    color: #dfe9e3;
-    padding-block: 3rem 1.5rem;
-    margin-top: 4rem;
-  }
-
-  .footer-grid {
-    display: grid;
-    gap: 2rem;
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 640px) {
-    .footer-grid {
-      grid-template-columns: 2fr 1fr 1fr;
-    }
-  }
-
-  .footer-brand {
-    font-family: var(--font-display);
-    color: #fff;
-    display: block;
-    margin-bottom: 0.5rem;
-  }
-
-  .footer-address {
-    color: #b9cabf;
-    font-size: 0.875rem;
-    margin: 0;
-  }
-
-  .footer-links {
-    list-style: none;
-    padding: 0;
-    margin: 0.75rem 0 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-
-  .footer-links a {
-    color: #cfe0d7;
-    text-decoration: none;
-    font-size: 0.875rem;
-  }
-
-  .footer-links a:hover {
-    color: #fff;
-  }
-
-  .footer-bottom {
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    font-size: 0.8125rem;
-    color: #a8bcb0;
-  }
-</style>

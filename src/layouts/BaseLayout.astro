@@ -1,15 +1,23 @@
 ---
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
+import { school } from '../data/school';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
 }
 
-const { title, description = 'Situs resmi SMP Negeri 20 Muaro Jambi.' } = Astro.props;
-const pageTitle = `${title} — SMP Negeri 20 Muaro Jambi`;
+const {
+  title,
+  description = `Situs resmi ${school.fullName} -- Explore, Learn, Grow. Informasi akademik, berita, kegiatan, dan PPDB.`,
+  ogImage, // TODO: set default gambar OG (1200x630) begitu public/images/hero/ terisi foto asli -- sengaja TIDAK diberi fallback path supaya nggak referensi file yang belum ada (404 kalau di-crawl medsos)
+} = Astro.props;
+
+const pageTitle = title === 'Beranda' ? `${school.name} — Explore, Learn, Grow` : `${title} — ${school.name}`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
@@ -19,20 +27,28 @@ const pageTitle = `${title} — SMP Negeri 20 Muaro Jambi`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
-    <meta property="og:site_name" content="SMP Negeri 20 Muaro Jambi" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <meta property="og:site_name" content={school.name} />
+    <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Baloo+2:wght@600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600&display=swap"
       rel="stylesheet"
     />
+
+    <script src="../scripts/interactions.ts"></script>
   </head>
-  <body>
+  <body class="bg-bg text-ink">
     <Navbar />
     <main>
       <slot />

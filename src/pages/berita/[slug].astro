@@ -1,67 +1,44 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection, render } from 'astro:content';
+import Icon from '../../components/Icon.astro';
+import { news } from '../../data/news';
 
-export async function getStaticPaths() {
-  const semuaBerita = await getCollection('berita', ({ data }) => !data.draft);
-
-  return semuaBerita.map((post) => ({
-    params: { slug: post.id },
-    props: { post },
+export function getStaticPaths() {
+  return news.map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
   }));
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
-
-const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+const { article } = Astro.props;
+const formattedDate = new Date(article.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
 
-<BaseLayout title={post.data.title} description={post.data.excerpt}>
-  <article class="section">
-    <div class="container article-container">
-      <a href="/berita" class="back-link">&larr; Semua Berita</a>
-      <span class="article-date">{formatTanggal(post.data.pubDate)}</span>
-      <h1>{post.data.title}</h1>
-      <div class="prose">
-        <Content />
+<BaseLayout title={article.title} description={article.excerpt} ogImage={article.cover ?? undefined}>
+  <article class="py-16 sm:py-20">
+    <div class="container-page mx-auto max-w-2xl">
+      <a href="/berita" class="reveal inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft hover:text-secondary">
+        <Icon name="arrow-right" class="h-4 w-4 rotate-180" />
+        Semua Berita
+      </a>
+
+      <span class="badge reveal mt-5 bg-secondary-light text-secondary-dark [animation-delay:60ms]">{article.category}</span>
+      <h1 class="reveal mt-3 text-3xl sm:text-4xl [animation-delay:100ms]">{article.title}</h1>
+      <p class="reveal mt-2 text-sm text-ink-faint [animation-delay:140ms]">{formattedDate}</p>
+
+      <div class="reveal mt-8 aspect-[16/9] w-full overflow-hidden rounded-[var(--radius-card-lg)] bg-gradient-to-br from-primary-light to-secondary-light [animation-delay:180ms]">
+        {article.cover ? (
+          <img src={article.cover} alt={article.title} class="h-full w-full object-cover" />
+        ) : (
+          <div class="flex h-full w-full items-center justify-center text-primary-dark/40">
+            <Icon name="file" class="h-12 w-12" />
+          </div>
+        )}
+      </div>
+
+      <div class="reveal mt-8 flex flex-col gap-4 text-base leading-relaxed text-ink-soft [animation-delay:220ms]">
+        {article.content.map((p) => <p>{p}</p>)}
       </div>
     </div>
   </article>
 </BaseLayout>
-
-<style>
-  .article-container {
-    max-width: 42rem;
-  }
-
-  .back-link {
-    display: inline-block;
-    font-size: 0.875rem;
-    color: var(--ink-soft);
-    text-decoration: none;
-    margin-bottom: 1rem;
-  }
-
-  .article-date {
-    display: block;
-    font-size: 0.875rem;
-    color: var(--ink-faint);
-    margin-bottom: 0.25rem;
-  }
-
-  .prose {
-    margin-top: 1.5rem;
-    font-size: 1.0625rem;
-    color: var(--ink);
-  }
-
-  .prose :global(h2) {
-    font-size: 1.25rem;
-    margin-top: 2rem;
-  }
-
-  .prose :global(img) {
-    border-radius: var(--radius-md);
-  }
-</style>

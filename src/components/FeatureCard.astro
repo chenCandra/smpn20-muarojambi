@@ -1,0 +1,27 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  icon: string;
+  title: string;
+  description: string;
+  tone?: 'primary' | 'secondary' | 'accent';
+  delay?: number;
+}
+
+const { icon, title, description, tone = 'primary', delay = 0 } = Astro.props;
+
+const toneClasses: Record<string, string> = {
+  primary: 'bg-primary-light text-primary-dark',
+  secondary: 'bg-secondary-light text-secondary-dark',
+  accent: 'bg-accent2-light text-accent2-dark',
+};
+---
+
+<div class="reveal card p-6 transition-transform duration-300 hover:-translate-y-1.5 hover:shadow-lg" style={`animation-delay:${delay}ms`}>
+  <div class:list={['flex h-12 w-12 items-center justify-center rounded-2xl', toneClasses[tone]]}>
+    <Icon name={icon} class="h-6 w-6" />
+  </div>
+  <h3 class="mt-4 text-lg">{title}</h3>
+  <p class="mt-1.5 text-sm text-ink-soft">{description}</p>
+</div>

@@ -1,0 +1,42 @@
+---
+import Icon from './Icon.astro';
+
+interface NavItem {
+  href: string;
+  label: string;
+}
+
+interface Props {
+  items: NavItem[];
+  currentPath: string;
+}
+
+const { items, currentPath } = Astro.props;
+const isActive = (href: string) => currentPath === href || (href !== '/' && currentPath.startsWith(href));
+---
+
+<div
+  data-mobile-menu
+  class="fixed inset-x-0 top-[64px] z-40 max-h-0 overflow-hidden border-b border-border bg-white shadow-lg transition-[max-height] duration-300 ease-out md:hidden [&.is-open]:max-h-[28rem]"
+>
+  <nav class="container-page flex flex-col gap-1 py-4" aria-label="Navigasi utama (mobile)">
+    {items.map((item) => (
+      <a
+        href={item.href}
+        class:list={[
+          'rounded-xl px-4 py-3 text-base font-semibold transition-colors',
+          isActive(item.href) ? 'bg-primary-light text-primary-dark' : 'text-ink-soft hover:bg-bg',
+        ]}
+      >
+        {item.label}
+      </a>
+    ))}
+    <a
+      href="/informasi#ppdb"
+      class="btn-accent mt-2 justify-center"
+    >
+      <Icon name="graduation-cap" class="h-4 w-4" />
+      Informasi PPDB
+    </a>
+  </nav>
+</div>

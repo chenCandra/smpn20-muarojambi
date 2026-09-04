@@ -1,0 +1,56 @@
+---
+import Icon from './Icon.astro';
+import DecorativeSpace from './DecorativeSpace.astro';
+---
+
+<section class="relative overflow-hidden bg-gradient-to-br from-secondary via-secondary to-primary-dark pt-14 pb-24 sm:pt-20 sm:pb-32">
+  <DecorativeSpace variant="hero" />
+
+  <div class="container-page relative grid items-center gap-10 lg:grid-cols-2">
+    <div class="reveal text-center lg:text-left">
+      <span class="badge bg-white/15 text-white ring-1 ring-white/25 backdrop-blur">
+        <Icon name="sparkle" class="h-3.5 w-3.5" />
+        Selamat Datang di SMPN 20 Muaro Jambi
+      </span>
+
+      <h1 class="mt-5 text-4xl leading-[1.1] text-white sm:text-5xl lg:text-[3.25rem]">
+        Tempat Ide Tumbuh,<br />Mimpi Dimulai.
+      </h1>
+
+      <p class="mx-auto mt-5 max-w-md text-base text-white/85 sm:text-lg lg:mx-0">
+        Sekolah tempat siswa belajar, berkarya, menemukan potensi, dan mempersiapkan diri untuk masa depan.
+      </p>
+
+      <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
+        <a href="/profil" class="btn-accent">
+          Jelajahi Sekolah
+          <Icon name="arrow-right" class="h-4 w-4" />
+        </a>
+        <a href="/berita" class="btn border-2 border-white/40 text-white hover:-translate-y-0.5 hover:bg-white/10">
+          Berita Terbaru
+        </a>
+      </div>
+    </div>
+
+    <div class="reveal relative mx-auto aspect-[4/3] w-full max-w-lg [animation-delay:150ms]">
+      <div class="absolute inset-0 rounded-[var(--radius-card-lg)] bg-white/10 ring-1 ring-white/20 backdrop-blur-sm"></div>
+      <div class="absolute inset-3 flex items-center justify-center overflow-hidden rounded-[calc(var(--radius-card-lg)-6px)] bg-white/5">
+        <!-- TODO: ganti dengan foto kegiatan siswa asli di public/images/hero/ -->
+        <div class="flex flex-col items-center gap-2 text-white/60">
+          <Icon name="graduation-cap" class="h-14 w-14" />
+          <span class="text-sm font-medium">Foto kegiatan siswa segera hadir</span>
+        </div>
+      </div>
+      <span class="absolute -right-4 -top-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent text-ink shadow-lg animate-float">
+        <Icon name="star" class="h-7 w-7" />
+      </span>
+      <span class="absolute -bottom-5 -left-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-secondary shadow-lg animate-float-slow">
+        <Icon name="atom" class="h-6 w-6" />
+      </span>
+    </div>
+  </div>
+
+  <svg class="absolute inset-x-0 -bottom-px h-12 w-full text-bg sm:h-16" viewBox="0 0 1440 74" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,32 C240,74 480,0 720,20 C960,40 1200,64 1440,20 L1440,74 L0,74 Z" fill="currentColor" />
+  </svg>
+</section>

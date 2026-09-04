@@ -1,0 +1,16 @@
+---
+interface Props {
+  value: number;
+  suffix?: string;
+  label: string;
+}
+
+const { value, suffix = '', label } = Astro.props;
+---
+
+<div class="reveal text-center">
+  <p class="text-4xl font-extrabold text-white sm:text-5xl">
+    <span data-countup={value} data-suffix={suffix}>0{suffix}</span>
+  </p>
+  <p class="mt-1 text-sm font-medium text-white/80">{label}</p>
+</div>

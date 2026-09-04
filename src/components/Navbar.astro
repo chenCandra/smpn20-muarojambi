@@ -1,315 +1,68 @@
 ---
-// Struktur menu 2 level: `link` biasa, atau `dropdown` dengan beberapa
-// sub-halaman. Di desktop dropdown-nya buka lewat hover/focus (CSS
-// murni); di mobile sub-item-nya langsung ditampilkan mendatar di dalam
-// menu (tanpa toggle tambahan) -- lebih simpel & tetap gampang dipakai
-// jari di layar kecil.
-type NavItem = { href: string; label: string };
-type NavEntry = { type: 'link'; href: string; label: string } | { type: 'dropdown'; label: string; items: NavItem[] };
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import MobileMenu from './MobileMenu.astro';
+import { school } from '../data/school';
 
-const navEntries: NavEntry[] = [
-  { type: 'link', href: '/', label: 'Beranda' },
-  {
-    type: 'dropdown',
-    label: 'Profil',
-    items: [
-      { href: '/profil', label: 'Profil Sekolah' },
-      { href: '/profil/sambutan-kepala-sekolah', label: 'Sambutan Kepala Sekolah' },
-      { href: '/profil/visi-misi', label: 'Visi & Misi' },
-      { href: '/profil/struktur-organisasi', label: 'Struktur Organisasi' },
-      { href: '/profil/guru-tendik', label: 'Guru & Tenaga Kependidikan' },
-    ],
-  },
-  { type: 'link', href: '/ppdb', label: 'PPDB' },
-  {
-    type: 'dropdown',
-    label: 'Informasi',
-    items: [
-      { href: '/berita', label: 'Berita' },
-      { href: '/agenda', label: 'Agenda' },
-      { href: '/prestasi', label: 'Prestasi' },
-      { href: '/pengumuman', label: 'Pengumuman' },
-      { href: '/galeri', label: 'Galeri' },
-    ],
-  },
-  { type: 'link', href: '/kontak', label: 'Kontak' },
+const navItems = [
+  { href: '/', label: 'Beranda' },
+  { href: '/profil', label: 'Profil' },
+  { href: '/akademik', label: 'Akademik' },
+  { href: '/kegiatan', label: 'Kegiatan' },
+  { href: '/berita', label: 'Berita' },
+  { href: '/informasi', label: 'Informasi' },
+  { href: '/kontak', label: 'Kontak' },
 ];
 
 const currentPath = Astro.url.pathname;
 const isActive = (href: string) => currentPath === href || (href !== '/' && currentPath.startsWith(href));
 ---
 
-<header class="navbar">
-  <div class="container navbar-inner">
-    <a href="/" class="brand">
-      <span class="brand-mark">20</span>
-      <span class="brand-text">
-        <strong>SMP Negeri 20</strong>
-        <small>Muaro Jambi</small>
+<header
+  data-navbar
+  class="group sticky top-0 z-50 border-b border-transparent bg-white/70 backdrop-blur transition-all duration-300 [&.is-scrolled]:border-border [&.is-scrolled]:bg-white/95 [&.is-scrolled]:shadow-sm"
+>
+  <div class="container-page flex h-16 items-center justify-between transition-all duration-300 group-[.is-scrolled]:h-14">
+    <a href="/" class="flex items-center gap-2.5">
+      <Logo size={38} />
+      <span class="flex flex-col leading-tight">
+        <span class="text-sm font-extrabold text-ink">{school.shortCode}</span>
+        <span class="text-[11px] font-medium text-ink-faint">Muaro Jambi</span>
       </span>
     </a>
 
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="navMenu" aria-label="Buka menu navigasi">
-      <span></span><span></span><span></span>
-    </button>
-
-    <nav id="navMenu" class="nav-menu">
-      <ul>
-        {navEntries.map((entry) =>
-          entry.type === 'link' ? (
-            <li>
-              <a href={entry.href} class:list={['nav-link', { active: isActive(entry.href) }]}>{entry.label}</a>
-            </li>
-          ) : (
-            <li class="has-dropdown">
-              <span class:list={['nav-link', { active: entry.items.some((i) => isActive(i.href)) }]}>{entry.label} <i class="caret">▾</i></span>
-              <ul class="dropdown-menu">
-                {entry.items.map((item) => (
-                  <li><a href={item.href} class:list={['dropdown-link', { active: isActive(item.href) }]}>{item.label}</a></li>
-                ))}
-              </ul>
-            </li>
-          )
-        )}
-      </ul>
+    <nav class="hidden items-center gap-1 md:flex" aria-label="Navigasi utama">
+      {navItems.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            'rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors',
+            isActive(item.href) ? 'text-primary-dark' : 'text-ink-soft hover:text-primary-dark',
+          ]}
+        >
+          {item.label}
+        </a>
+      ))}
     </nav>
+
+    <div class="flex items-center gap-2">
+      <a href="/informasi#ppdb" class="btn-accent hidden lg:inline-flex !px-4 !py-2 text-xs">
+        <Icon name="graduation-cap" class="h-4 w-4" />
+        Informasi PPDB
+      </a>
+
+      <button
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label="Buka menu navigasi"
+        class="flex h-10 w-10 items-center justify-center rounded-xl text-ink hover:bg-bg md:hidden"
+      >
+        <Icon name="menu" class="h-6 w-6" />
+      </button>
+    </div>
   </div>
 </header>
 
-<style>
-  .navbar {
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .navbar-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-block: 0.75rem;
-  }
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    text-decoration: none;
-    color: var(--ink);
-  }
-
-  .brand-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    background: var(--primary);
-    color: #fff;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 0.9375rem;
-    transition: transform 0.3s ease;
-  }
-
-  .brand:hover .brand-mark {
-    animation: wiggle 0.5s ease;
-  }
-
-  .brand-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-  }
-
-  .brand-text strong {
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-  }
-
-  .brand-text small {
-    color: var(--ink-soft);
-    font-size: 0.75rem;
-  }
-
-  .nav-toggle {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 5px;
-    width: 2.25rem;
-    height: 2.25rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-  }
-
-  .nav-toggle span {
-    display: block;
-    height: 2px;
-    background: var(--ink);
-    border-radius: 2px;
-  }
-
-  .nav-menu ul {
-    list-style: none;
-    display: flex;
-    gap: 0.25rem;
-    margin: 0;
-    padding: 0;
-  }
-
-  .nav-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.2rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--radius-sm);
-    text-decoration: none;
-    color: var(--ink-soft);
-    font-size: 0.9375rem;
-    font-weight: 500;
-    cursor: default;
-  }
-
-  a.nav-link {
-    cursor: pointer;
-  }
-
-  .nav-link:hover {
-    color: var(--primary);
-    background: var(--primary-soft);
-  }
-
-  .nav-link.active {
-    color: var(--primary);
-    font-weight: 700;
-  }
-
-  .caret {
-    font-style: normal;
-    font-size: 0.7rem;
-    transition: transform 0.15s ease;
-  }
-
-  .has-dropdown {
-    position: relative;
-  }
-
-  .dropdown-menu {
-    list-style: none;
-    margin: 0;
-    padding: 0.4rem;
-  }
-
-  .dropdown-link {
-    display: block;
-    padding: 0.5rem 0.7rem;
-    border-radius: var(--radius-sm);
-    text-decoration: none;
-    color: var(--ink-soft);
-    font-size: 0.875rem;
-    white-space: nowrap;
-  }
-
-  .dropdown-link:hover {
-    background: var(--primary-soft);
-    color: var(--primary);
-  }
-
-  .dropdown-link.active {
-    color: var(--primary);
-    font-weight: 700;
-  }
-
-  /* -- Desktop: dropdown mengambang, buka lewat hover/focus -- */
-  @media (min-width: 768px) {
-    .nav-toggle {
-      display: none;
-    }
-
-    .dropdown-menu {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      min-width: 15rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      box-shadow: 0 12px 24px -10px rgba(15, 81, 50, 0.2);
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(4px);
-      transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
-    }
-
-    .has-dropdown:hover .dropdown-menu,
-    .has-dropdown:focus-within .dropdown-menu {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .has-dropdown:hover .caret {
-      transform: rotate(180deg);
-    }
-  }
-
-  /* -- Mobile: menu jadi panel collapse, sub-item dropdown tampil rata (tanpa toggle) -- */
-  @media (max-width: 767px) {
-    .nav-menu {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.2s ease;
-    }
-
-    .nav-menu.is-open {
-      max-height: 32rem;
-      overflow-y: auto;
-    }
-
-    .nav-menu ul {
-      flex-direction: column;
-      padding: 0.5rem 1.25rem 1rem;
-    }
-
-    .nav-link {
-      display: block;
-      padding: 0.6rem 0.5rem;
-    }
-
-    .caret {
-      display: none;
-    }
-
-    .dropdown-menu {
-      padding-left: 0.75rem;
-      border-left: 2px solid var(--primary-soft);
-      margin-left: 0.5rem;
-    }
-
-    .dropdown-link {
-      padding: 0.45rem 0.5rem;
-    }
-  }
-</style>
-
-<script>
-  const toggle = document.querySelector<HTMLButtonElement>('.nav-toggle');
-  const menu = document.getElementById('navMenu');
-
-  toggle?.addEventListener('click', () => {
-    const isOpen = menu?.classList.toggle('is-open');
-    toggle.setAttribute('aria-expanded', String(!!isOpen));
-  });
-</script>
+<MobileMenu items={navItems} currentPath={currentPath} />

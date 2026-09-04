@@ -1,89 +1,56 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import Icon from '../components/Icon.astro';
+import { school } from '../data/school';
 
-// TODO: ganti semua nilai placeholder di bawah dengan data asli sekolah.
-const kontak = {
-  alamat: 'Kabupaten Muaro Jambi, Provinsi Jambi',
-  telepon: '(belum diisi)',
-  email: 'info@smpn20muarojambi.sch.id',
-  instagram: '',
-  mapsEmbed: '',
-};
+// TODO: ganti dengan embed peta asli (Google Maps) begitu koordinat sekolah tersedia.
+const mapsEmbed = '';
+
+const kontakList = [
+  { icon: 'map-pin', label: 'Alamat', value: `${school.address}, ${school.city}, ${school.province}` },
+  { icon: 'phone', label: 'Telepon', value: school.phone },
+  { icon: 'mail', label: 'Email', value: school.email },
+  { icon: 'external-link', label: 'Website', value: school.website.replace('https://', '') },
+];
 ---
 
-<BaseLayout title="Kontak" description="Alamat dan kontak SMP Negeri 20 Muaro Jambi.">
-  <section class="page-header">
-    <div class="container">
-      <span class="eyebrow">Hubungi Kami</span>
-      <h1>Kontak</h1>
+<BaseLayout title="Kontak" description={`Alamat dan kontak ${school.fullName}.`}>
+  <section class="bg-gradient-to-br from-primary-light/70 to-secondary-light/60 pb-16 pt-16 sm:pt-20">
+    <div class="container-page reveal">
+      <span class="badge bg-white text-primary-dark shadow-sm">Hubungi Kami</span>
+      <h1 class="mt-4 text-3xl sm:text-4xl">Kontak</h1>
+      <p class="mt-3 max-w-xl text-ink-soft">Ada pertanyaan? Jangan ragu untuk menghubungi kami.</p>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container grid grid-2 kontak-grid">
-      <div class="card kontak-card">
-        <h2>Informasi Kontak</h2>
-        <dl>
-          <dt>Alamat</dt>
-          <dd>{kontak.alamat}</dd>
-          <dt>Telepon</dt>
-          <dd>{kontak.telepon}</dd>
-          <dt>Email</dt>
-          <dd><a href={`mailto:${kontak.email}`}>{kontak.email}</a></dd>
-        </dl>
+  <section class="py-16 sm:py-20">
+    <div class="container-page grid gap-8 lg:grid-cols-2">
+      <div class="reveal card p-6">
+        <h2 class="text-lg">Informasi Kontak</h2>
+        <ul class="mt-5 space-y-4">
+          {kontakList.map((k) => (
+            <li class="flex items-start gap-3">
+              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-light text-primary-dark"><Icon name={k.icon} class="h-5 w-5" /></div>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-ink-faint">{k.label}</p>
+                <p class="text-sm font-medium">{k.value}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <div class="card map-card">
-        {kontak.mapsEmbed ? (
-          <Fragment set:html={kontak.mapsEmbed} />
+      <div class="reveal card overflow-hidden [animation-delay:100ms]">
+        {mapsEmbed ? (
+          <Fragment set:html={mapsEmbed} />
         ) : (
-          <div class="map-placeholder">Peta lokasi sekolah akan ditambahkan di sini.</div>
+          <div class="flex h-full min-h-[16rem] flex-col items-center justify-center gap-2 p-8 text-center text-ink-faint">
+            <Icon name="map-pin" class="h-10 w-10" />
+            <span class="text-sm">Peta lokasi sekolah akan ditambahkan di sini.</span>
+          </div>
         )}
       </div>
     </div>
   </section>
 </BaseLayout>
-
-<style>
-  .page-header {
-    background: var(--primary-soft);
-    padding-block: 3rem;
-  }
-
-  .kontak-card,
-  .map-card {
-    padding: 1.5rem;
-  }
-
-  dl {
-    margin: 1rem 0 0;
-  }
-
-  dt {
-    font-size: 0.8125rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--ink-faint);
-    margin-top: 1rem;
-  }
-
-  dt:first-child {
-    margin-top: 0;
-  }
-
-  dd {
-    margin: 0.2rem 0 0;
-    font-size: 1rem;
-  }
-
-  .map-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    min-height: 12rem;
-    color: var(--ink-faint);
-    text-align: center;
-    font-size: 0.875rem;
-  }
-</style>

@@ -1,0 +1,47 @@
+---
+import Icon from './Icon.astro';
+import type { NewsArticle } from '../data/news';
+
+interface Props {
+  article: NewsArticle;
+}
+
+const { article } = Astro.props;
+
+const categoryTone: Record<string, string> = {
+  Prestasi: 'bg-accent-light text-accent-dark',
+  Akademik: 'bg-primary-light text-primary-dark',
+  Kegiatan: 'bg-secondary-light text-secondary-dark',
+  Pengumuman: 'bg-accent2-light text-accent2-dark',
+  Sekolah: 'bg-slate-100 text-ink-soft',
+};
+
+const formattedDate = new Date(article.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<a href={`/berita/${article.slug}`} class="card group reveal flex h-full flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg">
+  <div class="relative aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-primary-light to-secondary-light">
+    {article.cover ? (
+      <img
+        src={article.cover}
+        alt={article.title}
+        loading="lazy"
+        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+      />
+    ) : (
+      <div class="flex h-full w-full items-center justify-center text-primary-dark/40">
+        <Icon name="file" class="h-10 w-10" />
+      </div>
+    )}
+    <span class:list={['badge absolute left-3 top-3 !py-1', categoryTone[article.category]]}>{article.category}</span>
+  </div>
+  <div class="flex flex-1 flex-col p-5">
+    <span class="text-xs font-medium text-ink-faint">{formattedDate}</span>
+    <h3 class="mt-1.5 text-base leading-snug">{article.title}</h3>
+    <p class="mt-2 line-clamp-2 flex-1 text-sm text-ink-soft">{article.excerpt}</p>
+    <span class="mt-4 inline-flex items-center gap-1 text-sm font-bold text-secondary">
+      Baca selengkapnya
+      <Icon name="arrow-right" class="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+    </span>
+  </div>
+</a>
