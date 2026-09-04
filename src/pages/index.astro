@@ -1,34 +1,52 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Mascot from '../components/Mascot.astro';
+import FloatingShapes from '../components/FloatingShapes.astro';
 import { getCollection } from 'astro:content';
 
 const semuaBerita = await getCollection('berita', ({ data }) => !data.draft);
 const beritaTerbaru = semuaBerita.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
 
 const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+const highlights = [
+  { emoji: '📚', title: 'Kurikulum Merdeka', text: 'Pembelajaran yang berpusat pada peserta didik, mendorong minat dan potensi setiap siswa.' },
+  { emoji: '🎨', title: 'Ekstrakurikuler', text: 'Beragam kegiatan pengembangan bakat non-akademik untuk menunjang tumbuh kembang siswa.' },
+  { emoji: '🌟', title: 'Guru Berkualitas', text: 'Tenaga pendidik profesional yang berkomitmen mendampingi proses belajar siswa.' },
+];
 ---
 
 <BaseLayout title="Beranda">
   <section class="hero">
+    <FloatingShapes />
     <div class="container hero-inner">
-      <span class="eyebrow">Selamat Datang</span>
-      <h1>SMP Negeri 20 Muaro Jambi</h1>
-      <p class="hero-lede">
-        Mewujudkan generasi yang berakhlak mulia, cerdas, dan berdaya saing melalui pendidikan yang berkualitas
-        di lingkungan Kabupaten Muaro Jambi.
-      </p>
-      <div class="hero-actions">
-        <a href="/ppdb" class="btn btn-primary">Info PPDB</a>
-        <a href="/profil" class="btn btn-outline">Profil Sekolah</a>
+      <div class="hero-text">
+        <span class="eyebrow">👋 Selamat Datang</span>
+        <h1>SMP Negeri 20 Muaro Jambi</h1>
+        <p class="hero-lede">
+          Sekolah seru buat belajar, berkarya, dan berteman! Kami mewujudkan generasi yang berakhlak mulia,
+          cerdas, dan berdaya saing di Kabupaten Muaro Jambi.
+        </p>
+        <div class="hero-actions">
+          <a href="/ppdb" class="btn btn-primary">Info PPDB</a>
+          <a href="/profil" class="btn btn-outline">Profil Sekolah</a>
+        </div>
+      </div>
+      <div class="hero-mascot">
+        <Mascot size={220} />
       </div>
     </div>
+
+    <svg class="hero-wave" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,32 C240,80 480,0 720,24 C960,48 1200,72 1440,24 L1440,80 L0,80 Z" fill="var(--surface)" />
+    </svg>
   </section>
 
   <section class="section">
     <div class="container">
       <div class="section-head">
         <div>
-          <span class="eyebrow">Berita</span>
+          <span class="eyebrow">📰 Berita</span>
           <h2>Kabar Terbaru</h2>
         </div>
         <a href="/berita" class="btn btn-outline">Semua Berita</a>
@@ -52,31 +70,39 @@ const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric
 
   <section class="section section-alt">
     <div class="container grid grid-3 highlight-grid">
-      <div class="card highlight-card">
-        <h3>Kurikulum Merdeka</h3>
-        <p>Pembelajaran yang berpusat pada peserta didik, mendorong minat dan potensi setiap siswa.</p>
-      </div>
-      <div class="card highlight-card">
-        <h3>Ekstrakurikuler</h3>
-        <p>Beragam kegiatan pengembangan bakat non-akademik untuk menunjang tumbuh kembang siswa.</p>
-      </div>
-      <div class="card highlight-card">
-        <h3>Guru Berkualitas</h3>
-        <p>Tenaga pendidik profesional yang berkomitmen mendampingi proses belajar siswa.</p>
-      </div>
+      {highlights.map((item) => (
+        <div class="card highlight-card">
+          <span class="highlight-emoji">{item.emoji}</span>
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+        </div>
+      ))}
     </div>
   </section>
 </BaseLayout>
 
 <style>
   .hero {
+    position: relative;
     background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: #fff;
-    padding-block: 4.5rem;
+    padding-block: 4rem 5.5rem;
+    overflow: hidden;
   }
 
   .hero-inner {
-    max-width: 40rem;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-text {
+    max-width: 34rem;
+    flex: 1 1 20rem;
   }
 
   .hero h1 {
@@ -105,6 +131,28 @@ const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric
     background: rgba(255, 255, 255, 0.12);
   }
 
+  .hero-mascot {
+    flex: 0 0 auto;
+    filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.2));
+  }
+
+  @media (max-width: 640px) {
+    .hero-mascot {
+      width: 9rem;
+      margin-inline: auto;
+    }
+  }
+
+  .hero-wave {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 48px;
+    display: block;
+  }
+
   .section-head {
     display: flex;
     flex-wrap: wrap;
@@ -124,10 +172,6 @@ const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric
     text-decoration: none;
     color: var(--ink);
     height: 100%;
-  }
-
-  .news-card:hover {
-    border-color: var(--primary);
   }
 
   .news-date {
@@ -152,6 +196,27 @@ const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric
 
   .highlight-card {
     padding: 1.5rem;
+    text-align: center;
+  }
+
+  .highlight-emoji {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .highlight-card:nth-child(2) .highlight-emoji {
+    background: var(--accent2-soft);
+  }
+
+  .highlight-card:nth-child(3) .highlight-emoji {
+    background: var(--accent3-soft);
   }
 
   .highlight-card h3 {

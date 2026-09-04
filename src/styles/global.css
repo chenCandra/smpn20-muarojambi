@@ -1,27 +1,40 @@
-/* Design tokens -- palet hijau tua (identitas institusional, umum dipakai
-   sekolah negeri Indonesia) + emas sebagai aksen. Ganti nilai di sini kalau
-   sekolah punya warna seragam/almamater resmi yang beda. */
+/* Design tokens -- palet hijau tetap jadi identitas utama (institusional,
+   umum dipakai sekolah negeri), tapi dicerahkan + ditambah aksen oranye/biru
+   yang lebih riang, ditujukan buat audiens siswa SMP (bukan cuma orang
+   tua/dinas yang baca situs sekolah). Ganti nilai di sini kalau sekolah
+   punya warna seragam/almamater resmi yang beda. */
 :root {
-  --primary: #0f5132;
-  --primary-dark: #0a3a24;
-  --primary-soft: #e6f2ec;
-  --accent: #c9971c;
-  --accent-soft: #fbf1dd;
+  --primary: #1a8a54;
+  --primary-dark: #0f5132;
+  --primary-soft: #e5f7ec;
 
-  --ink: #16211c;
-  --ink-soft: #4b5a52;
-  --ink-faint: #8a978f;
+  --accent: #ff8a3d;
+  --accent-soft: #fff1e2;
+
+  --accent2: #2fb6e0;
+  --accent2-soft: #e3f6fc;
+
+  --accent3: #ff6f91;
+  --accent3-soft: #ffe9ee;
+
+  --ink: #1c2620;
+  --ink-soft: #536057;
+  --ink-faint: #8fa198;
 
   --surface: #ffffff;
-  --surface-alt: #f6f8f6;
-  --border: #dce4de;
+  --surface-alt: #f5faf7;
+  --border: #e0ebe4;
 
-  --radius-sm: 0.5rem;
-  --radius-md: 0.875rem;
-  --radius-lg: 1.5rem;
+  --radius-sm: 0.6rem;
+  --radius-md: 1.1rem;
+  --radius-lg: 1.75rem;
 
-  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  /* Baloo 2 -- font bulat & tebal, kesan ceria/ramah anak, dipakai buat
+     judul. Nunito -- sans rounded juga tapi lebih netral, tetap enak dibaca
+     panjang buat isi paragraf. Dua-duanya dari Google Fonts (di-load di
+     BaseLayout). */
+  --font-body: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Baloo 2', ui-sans-serif, system-ui, sans-serif;
 
   --max-width: 72rem;
 }
@@ -43,6 +56,7 @@ body {
   line-height: 1.6;
   color: var(--ink);
   background: var(--surface);
+  overflow-x: hidden; /* biar dekorasi mengambang yang sengaja "nyeruduk" tepi layar nggak bikin scrollbar horizontal */
 }
 
 img {
@@ -56,7 +70,8 @@ a {
 
 h1, h2, h3, h4 {
   font-family: var(--font-display);
-  line-height: 1.25;
+  font-weight: 700;
+  line-height: 1.2;
   margin: 0 0 0.5em;
 }
 
@@ -75,25 +90,43 @@ p {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+a.card:hover,
+.card.is-hoverable:hover {
+  transform: translateY(-4px) rotate(-0.5deg);
+  box-shadow: 0 14px 30px -12px rgba(15, 81, 50, 0.25);
+  border-color: var(--primary);
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.65rem 1.25rem;
+  padding: 0.7rem 1.4rem;
   border-radius: 999px;
+  font-family: var(--font-display);
   font-weight: 600;
   font-size: 0.9375rem;
   text-decoration: none;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.btn:active {
+  transform: scale(0.96);
 }
 
 .btn-primary {
   background: var(--primary);
   color: #fff;
+  box-shadow: 0 6px 16px -6px rgba(26, 138, 84, 0.55);
 }
 
 .btn-primary:hover {
@@ -112,9 +145,11 @@ p {
 }
 
 .eyebrow {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--accent);
@@ -123,6 +158,7 @@ p {
 
 .section {
   padding-block: 3.5rem;
+  position: relative;
 }
 
 .section-alt {
@@ -137,4 +173,38 @@ p {
 @media (min-width: 640px) {
   .grid-2 { grid-template-columns: repeat(2, 1fr); }
   .grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* -- Animasi dekoratif reusable, dipakai maskot & bentuk-bentuk mengambang -- */
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes float-drift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(6px, -14px) rotate(8deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+
+@keyframes wave-arm {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(22deg); }
+  40% { transform: rotate(2deg); }
+  60% { transform: rotate(22deg); }
+  80% { transform: rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

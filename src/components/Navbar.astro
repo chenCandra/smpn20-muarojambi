@@ -78,6 +78,11 @@ const currentPath = Astro.url.pathname;
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 0.9375rem;
+    transition: transform 0.3s ease;
+  }
+
+  .brand:hover .brand-mark {
+    animation: wiggle 0.5s ease;
   }
 
   .brand-text {

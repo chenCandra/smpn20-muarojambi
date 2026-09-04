@@ -1,0 +1,84 @@
+---
+// Bintang & lingkaran kecil yang mengambang pelan di latar -- dekorasi
+// murni (aria-hidden), dipakai di section hero biar kesannya lebih ceria/
+// hidup. Naruh elemen ini di dalam parent yang `position:relative`.
+---
+
+<div class="floating-shapes" aria-hidden="true">
+  <svg class="shape shape-star-1" viewBox="0 0 24 24" fill="#ffce54"><path d="M12 0l3 8 8 1-6 6 2 9-7-4-7 4 2-9-6-6 8-1z"/></svg>
+  <svg class="shape shape-star-2" viewBox="0 0 24 24" fill="#2fb6e0"><path d="M12 0l3 8 8 1-6 6 2 9-7-4-7 4 2-9-6-6 8-1z"/></svg>
+  <span class="shape shape-dot-1"></span>
+  <span class="shape shape-dot-2"></span>
+  <span class="shape shape-dot-3"></span>
+</div>
+
+<style>
+  .floating-shapes {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .shape {
+    position: absolute;
+    display: block;
+  }
+
+  .shape-star-1 {
+    width: 28px;
+    top: 12%;
+    left: 8%;
+    animation: float-drift 5s ease-in-out infinite;
+  }
+
+  .shape-star-2 {
+    width: 20px;
+    top: 65%;
+    left: 92%;
+    animation: float-drift 4.2s ease-in-out infinite;
+    animation-delay: 0.8s;
+  }
+
+  .shape-dot-1 {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ff6f91;
+    top: 22%;
+    left: 88%;
+    animation: bob 3.6s ease-in-out infinite;
+  }
+
+  .shape-dot-2 {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0.6;
+    top: 75%;
+    left: 14%;
+    animation: bob 4.4s ease-in-out infinite;
+    animation-delay: 1.2s;
+  }
+
+  .shape-dot-3 {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffce54;
+    opacity: 0.85;
+    top: 8%;
+    left: 78%;
+    animation: float-drift 6s ease-in-out infinite;
+    animation-delay: 0.4s;
+  }
+
+  @media (max-width: 640px) {
+    /* Layar kecil lebih sempit, sebagian bentuk bisa nabrak teks -- redupin
+       aja daripada disembunyikan total (tetap ada kesan ceria di mobile). */
+    .shape {
+      opacity: 0.5;
+    }
+  }
+</style>
