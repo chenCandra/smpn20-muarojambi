@@ -1,0 +1,33 @@
+name: Deploy ke Cloudflare
+
+# Jalan otomatis tiap push ke master -- build Astro lalu wrangler deploy.
+# BUTUH secret CLOUDFLARE_API_TOKEN diisi dulu di Settings > Secrets and
+# variables > Actions milik repo ini (lihat README.md bagian deploy untuk
+# cara bikin token-nya) -- sebelum itu diisi, workflow ini akan gagal di
+# langkah "Deploy" (build tetap sukses, cuma deploy-nya yang ditolak
+# Cloudflare karena tidak ada token).
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: deploy

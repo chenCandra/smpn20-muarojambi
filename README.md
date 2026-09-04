@@ -31,10 +31,32 @@ Nama file jadi bagian URL-nya (`selamat-datang.md` -> `/berita/selamat-datang`).
 
 ## Build & deploy
 
+### Deploy manual dari komputer sendiri (paling cepat buat mulai)
+
 ```bash
 npm run build     # hasilnya di folder dist/
-npm run deploy     # build lalu `wrangler deploy` (butuh sudah `wrangler login` / API token)
+npx wrangler login # sekali saja, buka browser buat login akun Cloudflare
+npm run deploy     # build lalu `wrangler deploy`
 ```
+
+Setelah `wrangler login` & `wrangler deploy` pertama kali sukses, situs langsung bisa
+diakses lewat alamat gratis `https://smpn20-muarojambi.<nama-akun>.workers.dev`
+(muncul di output terminal).
+
+### Deploy otomatis tiap push ke GitHub (`.github/workflows/deploy.yml`)
+
+Sudah disiapkan, tinggal aktifkan sekali:
+
+1. Buka **dash.cloudflare.com** -> **My Profile** -> **API Tokens** -> **Create Token** ->
+   pilih template **"Edit Cloudflare Workers"** (atau buat custom token dengan izin
+   `Account.Workers Scripts: Edit` dan `Account.Workers Routes: Edit` kalau pakai custom domain).
+2. Salin token yang dihasilkan.
+3. Di repo GitHub ini: **Settings** -> **Secrets and variables** -> **Actions** ->
+   **New repository secret** -> nama `CLOUDFLARE_API_TOKEN`, isi tokennya, simpan.
+4. Push apa saja ke branch `master` -> tab **Actions** di GitHub akan otomatis build & deploy.
+
+Setelah ini aktif, siapa pun yang push ke `master` (termasuk edit berita lewat GitHub
+web editor, tanpa perlu install apa-apa di komputer) situsnya otomatis ter-update.
 
 ## Yang masih perlu dilengkapi
 
