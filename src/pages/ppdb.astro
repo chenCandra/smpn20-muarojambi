@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="PPDB" description="Informasi Penerimaan Peserta Didik Baru (PPDB) SMP Negeri 20 Muaro Jambi.">
+  <section class="page-header">
+    <div class="container">
+      <span class="eyebrow">Pendaftaran</span>
+      <h1>Penerimaan Peserta Didik Baru (PPDB)</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container prose-container">
+      <!-- TODO: ganti seluruh isi bagian ini dengan jadwal & syarat PPDB yang sebenarnya begitu sudah ditetapkan dinas pendidikan. -->
+      <div class="card notice-card">
+        <strong>Pengumuman</strong>
+        <p>Jadwal dan alur pendaftaran PPDB tahun ajaran berjalan akan diumumkan di halaman ini. Silakan pantau
+          secara berkala, atau hubungi sekolah langsung untuk informasi terbaru.</p>
+      </div>
+
+      <h2>Syarat Umum Pendaftaran</h2>
+      <ul>
+        <li>Fotokopi Kartu Keluarga (KK)</li>
+        <li>Fotokopi Akta Kelahiran</li>
+        <li>Ijazah/Surat Keterangan Lulus SD/sederajat</li>
+        <li>Pas foto terbaru</li>
+      </ul>
+
+      <h2>Jalur Pendaftaran</h2>
+      <p>Mengikuti ketentuan Sistem Penerimaan Murid Baru (SPMB) yang ditetapkan Pemerintah Kabupaten/Provinsi,
+        umumnya meliputi jalur zonasi, afirmasi, perpindahan tugas orang tua, dan prestasi.</p>
+
+      <a href="/kontak" class="btn btn-primary">Hubungi Sekolah</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header {
+    background: var(--primary-soft);
+    padding-block: 3rem;
+  }
+
+  .prose-container {
+    max-width: 42rem;
+  }
+
+  .notice-card {
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .notice-card p {
+    margin: 0.35rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.9375rem;
+  }
+
+  h2 {
+    font-size: 1.125rem;
+    margin-top: 2rem;
+  }
+</style>

@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Profil Sekolah" description="Profil, visi, dan misi SMP Negeri 20 Muaro Jambi.">
+  <section class="page-header">
+    <div class="container">
+      <span class="eyebrow">Tentang Kami</span>
+      <h1>Profil Sekolah</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container prose-container">
+      <h2>Sekilas SMP Negeri 20 Muaro Jambi</h2>
+      <p>
+        <!-- TODO: lengkapi dengan sejarah singkat sekolah yang sebenarnya (tahun berdiri, lokasi lengkap, dsb). -->
+        SMP Negeri 20 Muaro Jambi adalah sekolah menengah pertama negeri yang berlokasi di Kabupaten Muaro Jambi,
+        Provinsi Jambi. Sekolah ini berkomitmen menyelenggarakan pendidikan yang berkualitas, membentuk karakter
+        siswa yang berakhlak mulia, serta mengembangkan potensi akademik dan non-akademik setiap peserta didik.
+      </p>
+
+      <div class="grid grid-2 vm-grid">
+        <div class="card vm-card">
+          <h3>Visi</h3>
+          <p><!-- TODO: isi visi sekolah yang sebenarnya --> Terwujudnya peserta didik yang beriman, berakhlak mulia, cerdas, dan berdaya saing di era global.</p>
+        </div>
+        <div class="card vm-card">
+          <h3>Misi</h3>
+          <ul>
+            <li><!-- TODO: isi misi sekolah yang sebenarnya --> Menyelenggarakan pembelajaran yang aktif, kreatif, dan menyenangkan.</li>
+            <li>Membina karakter siswa melalui keteladanan dan pembiasaan.</li>
+            <li>Mengembangkan bakat dan minat siswa melalui kegiatan ekstrakurikuler.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header {
+    background: var(--primary-soft);
+    padding-block: 3rem;
+  }
+
+  .prose-container {
+    max-width: 48rem;
+  }
+
+  .vm-grid {
+    margin-top: 2rem;
+  }
+
+  .vm-card {
+    padding: 1.5rem;
+  }
+
+  .vm-card h3 {
+    color: var(--primary);
+  }
+
+  .vm-card p,
+  .vm-card ul {
+    color: var(--ink-soft);
+    font-size: 0.9375rem;
+    margin: 0;
+  }
+
+  .vm-card ul {
+    padding-left: 1.1rem;
+  }
+
+  .vm-card li + li {
+    margin-top: 0.4rem;
+  }
+</style>

@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// TODO: ganti jadi daftar foto asli begitu ada -- taruh filenya di
+// public/galeri/ lalu isi array ini, atau upgrade ke content collection
+// kalau jumlah fotonya sudah banyak & sering ganti.
+const contohGaleri: { judul: string }[] = [];
+---
+
+<BaseLayout title="Galeri" description="Galeri foto kegiatan SMP Negeri 20 Muaro Jambi.">
+  <section class="page-header">
+    <div class="container">
+      <span class="eyebrow">Dokumentasi</span>
+      <h1>Galeri</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      {contohGaleri.length === 0 ? (
+        <div class="card empty-state">
+          <p>Galeri foto kegiatan sekolah akan segera hadir di sini.</p>
+        </div>
+      ) : (
+        <div class="grid grid-3">
+          {contohGaleri.map((foto) => (
+            <div class="card photo-card">{foto.judul}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header {
+    background: var(--primary-soft);
+    padding-block: 3rem;
+  }
+
+  .empty-state {
+    padding: 3rem;
+    text-align: center;
+    color: var(--ink-soft);
+  }
+</style>

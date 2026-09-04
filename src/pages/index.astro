@@ -1,0 +1,167 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const semuaBerita = await getCollection('berita', ({ data }) => !data.draft);
+const beritaTerbaru = semuaBerita.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
+
+const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<BaseLayout title="Beranda">
+  <section class="hero">
+    <div class="container hero-inner">
+      <span class="eyebrow">Selamat Datang</span>
+      <h1>SMP Negeri 20 Muaro Jambi</h1>
+      <p class="hero-lede">
+        Mewujudkan generasi yang berakhlak mulia, cerdas, dan berdaya saing melalui pendidikan yang berkualitas
+        di lingkungan Kabupaten Muaro Jambi.
+      </p>
+      <div class="hero-actions">
+        <a href="/ppdb" class="btn btn-primary">Info PPDB</a>
+        <a href="/profil" class="btn btn-outline">Profil Sekolah</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Berita</span>
+          <h2>Kabar Terbaru</h2>
+        </div>
+        <a href="/berita" class="btn btn-outline">Semua Berita</a>
+      </div>
+
+      {beritaTerbaru.length === 0 ? (
+        <p class="empty-note">Belum ada berita yang diterbitkan.</p>
+      ) : (
+        <div class="grid grid-3">
+          {beritaTerbaru.map((post) => (
+            <a href={`/berita/${post.id}`} class="card news-card">
+              <span class="news-date">{formatTanggal(post.data.pubDate)}</span>
+              <h3>{post.data.title}</h3>
+              {post.data.excerpt && <p>{post.data.excerpt}</p>}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container grid grid-3 highlight-grid">
+      <div class="card highlight-card">
+        <h3>Kurikulum Merdeka</h3>
+        <p>Pembelajaran yang berpusat pada peserta didik, mendorong minat dan potensi setiap siswa.</p>
+      </div>
+      <div class="card highlight-card">
+        <h3>Ekstrakurikuler</h3>
+        <p>Beragam kegiatan pengembangan bakat non-akademik untuk menunjang tumbuh kembang siswa.</p>
+      </div>
+      <div class="card highlight-card">
+        <h3>Guru Berkualitas</h3>
+        <p>Tenaga pendidik profesional yang berkomitmen mendampingi proses belajar siswa.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #fff;
+    padding-block: 4.5rem;
+  }
+
+  .hero-inner {
+    max-width: 40rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.85rem, 4vw, 2.75rem);
+    color: #fff;
+  }
+
+  .hero-lede {
+    color: #dcebe3;
+    font-size: 1.0625rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .hero .btn-outline {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .hero .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .section-head h2 {
+    margin: 0;
+  }
+
+  .news-card {
+    display: block;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: var(--ink);
+    height: 100%;
+  }
+
+  .news-card:hover {
+    border-color: var(--primary);
+  }
+
+  .news-date {
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+  }
+
+  .news-card h3 {
+    font-size: 1.0625rem;
+    margin: 0.4rem 0 0.4rem;
+  }
+
+  .news-card p {
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .empty-note {
+    color: var(--ink-soft);
+  }
+
+  .highlight-card {
+    padding: 1.5rem;
+  }
+
+  .highlight-card h3 {
+    color: var(--primary);
+    font-size: 1.0625rem;
+  }
+
+  .highlight-card p {
+    color: var(--ink-soft);
+    font-size: 0.9375rem;
+    margin: 0;
+  }
+</style>

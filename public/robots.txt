@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://smpn20muarojambi.sch.id/sitemap-index.xml

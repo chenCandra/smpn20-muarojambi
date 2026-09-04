@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const semuaBerita = await getCollection('berita', ({ data }) => !data.draft);
+const berita = semuaBerita.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const formatTanggal = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<BaseLayout title="Berita" description="Kabar dan kegiatan terbaru dari SMP Negeri 20 Muaro Jambi.">
+  <section class="page-header">
+    <div class="container">
+      <span class="eyebrow">Informasi</span>
+      <h1>Berita</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      {berita.length === 0 ? (
+        <p class="empty-note">Belum ada berita yang diterbitkan.</p>
+      ) : (
+        <div class="grid grid-3">
+          {berita.map((post) => (
+            <a href={`/berita/${post.id}`} class="card news-card">
+              <span class="news-date">{formatTanggal(post.data.pubDate)}</span>
+              <h2>{post.data.title}</h2>
+              {post.data.excerpt && <p>{post.data.excerpt}</p>}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header {
+    background: var(--primary-soft);
+    padding-block: 3rem;
+  }
+
+  .news-card {
+    display: block;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: var(--ink);
+    height: 100%;
+  }
+
+  .news-card:hover {
+    border-color: var(--primary);
+  }
+
+  .news-date {
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+  }
+
+  .news-card h2 {
+    font-size: 1.0625rem;
+    margin: 0.4rem 0 0.4rem;
+  }
+
+  .news-card p {
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .empty-note {
+    color: var(--ink-soft);
+  }
+</style>

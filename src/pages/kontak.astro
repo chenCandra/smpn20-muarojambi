@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// TODO: ganti semua nilai placeholder di bawah dengan data asli sekolah.
+const kontak = {
+  alamat: 'Kabupaten Muaro Jambi, Provinsi Jambi',
+  telepon: '(belum diisi)',
+  email: 'info@smpn20muarojambi.sch.id',
+  instagram: '',
+  mapsEmbed: '',
+};
+---
+
+<BaseLayout title="Kontak" description="Alamat dan kontak SMP Negeri 20 Muaro Jambi.">
+  <section class="page-header">
+    <div class="container">
+      <span class="eyebrow">Hubungi Kami</span>
+      <h1>Kontak</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid grid-2 kontak-grid">
+      <div class="card kontak-card">
+        <h2>Informasi Kontak</h2>
+        <dl>
+          <dt>Alamat</dt>
+          <dd>{kontak.alamat}</dd>
+          <dt>Telepon</dt>
+          <dd>{kontak.telepon}</dd>
+          <dt>Email</dt>
+          <dd><a href={`mailto:${kontak.email}`}>{kontak.email}</a></dd>
+        </dl>
+      </div>
+
+      <div class="card map-card">
+        {kontak.mapsEmbed ? (
+          <Fragment set:html={kontak.mapsEmbed} />
+        ) : (
+          <div class="map-placeholder">Peta lokasi sekolah akan ditambahkan di sini.</div>
+        )}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header {
+    background: var(--primary-soft);
+    padding-block: 3rem;
+  }
+
+  .kontak-card,
+  .map-card {
+    padding: 1.5rem;
+  }
+
+  dl {
+    margin: 1rem 0 0;
+  }
+
+  dt {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    margin-top: 1rem;
+  }
+
+  dt:first-child {
+    margin-top: 0;
+  }
+
+  dd {
+    margin: 0.2rem 0 0;
+    font-size: 1rem;
+  }
+
+  .map-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 12rem;
+    color: var(--ink-faint);
+    text-align: center;
+    font-size: 0.875rem;
+  }
+</style>
