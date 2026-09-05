@@ -25,12 +25,5 @@ export const school = {
   },
 } as const;
 
-// Statistik sekolah -- ANGKA DI BAWAH PLACEHOLDER, belum data resmi.
-// Ditaruh terpisah dari komponen StatCard biar gampang diganti tanpa
-// menyentuh kode tampilan.
-export const stats = [
-  { label: 'Siswa', value: 500, suffix: '+' },
-  { label: 'Guru & Tenaga Kependidikan', value: 30, suffix: '+' },
-  { label: 'Ekstrakurikuler', value: 15, suffix: '+' },
-  { label: 'Tahun Berkarya', value: 20, suffix: '+' },
-] as const;
+// Statistik sekolah (kartu angka di beranda) pindah ke Cloudflare D1,
+// diedit lewat /admin/stats -- lihat src/lib/stats.ts.

@@ -39,3 +39,28 @@ CREATE TABLE IF NOT EXISTS posts (
 CREATE INDEX IF NOT EXISTS idx_posts_status_published ON posts(status, published_at);
 CREATE INDEX IF NOT EXISTS idx_posts_category ON posts(category);
 CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
+
+-- Kartu statistik di beranda (jumlah siswa, guru, dst) -- sebelumnya
+-- src/data/school.ts (export `stats`), sekarang diedit lewat /admin/stats.
+CREATE TABLE IF NOT EXISTS stats (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  label TEXT NOT NULL,
+  value INTEGER NOT NULL,
+  suffix TEXT NOT NULL DEFAULT '',
+  sort_order INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_stats_sort ON stats(sort_order);
+
+-- Direktori guru & tenaga kependidikan -- sebelumnya src/data/teachers.ts,
+-- sekarang diedit lewat /admin/teachers.
+CREATE TABLE IF NOT EXISTS teachers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  position TEXT NOT NULL,
+  subject TEXT,
+  photo TEXT, -- path/URL foto, opsional (sama seperti posts.cover -- teks link, bukan upload file)
+  sort_order INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_teachers_sort ON teachers(sort_order);

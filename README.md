@@ -3,9 +3,9 @@
 Situs resmi sekolah -- **Explore • Learn • Grow**. Dibangun pakai
 [Astro](https://astro.build) + [Tailwind CSS v4](https://tailwindcss.com), di-deploy ke
 Cloudflare (Workers + Static Assets, deploy manual atau otomatis lewat GitHub Actions).
-Sebagian besar halaman tetap statis (cepat, gratis), tapi Berita/Info sekarang dikelola
-lewat **panel admin** (`/admin`) yang disimpan di Cloudflare D1 -- lihat bagian
-[Panel Admin](#panel-admin) di bawah.
+Sebagian besar halaman tetap statis (cepat, gratis), tapi Berita/Info, Guru & Tenaga
+Kependidikan, dan Statistik beranda sekarang dikelola lewat **panel admin** (`/admin`)
+yang disimpan di Cloudflare D1 -- lihat bagian [Panel Admin](#panel-admin) di bawah.
 
 ## Menjalankan di lokal
 
@@ -22,16 +22,16 @@ Buka `http://localhost:4321`. Binding D1 lokal dipakai lewat `platformProxy`
 
 ```
 src/
-├── data/                 # Konten yang MASIH statis (bukan Berita/Info -- itu lewat /admin, lihat db/)
-│   ├── school.ts         # identitas sekolah + statistik (jumlah siswa, guru, dst)
-│   ├── teachers.ts       # direktori guru & tenaga kependidikan
+├── data/                 # Konten yang MASIH statis (Berita, Guru, Statistik lewat /admin, lihat db/)
+│   ├── school.ts         # identitas sekolah (nama, alamat, telepon, dst)
 │   ├── events.ts          # agenda/kalender kegiatan
 │   ├── extracurriculars.ts # daftar ekstrakurikuler
 │   ├── fields.ts           # 6 bidang minat "Explore Your Universe"
 │   └── gallery.ts          # foto galeri
-├── lib/                   # Backend admin: auth.ts, session.ts, posts.ts (query D1), require-auth.ts, env.ts
-├── pages/admin/           # Panel admin (login, dashboard, tulis/edit/hapus berita) -- lihat Panel Admin di bawah
-├── components/            # komponen reusable (Navbar, Hero, NewsCard, dst)
+├── lib/                   # Backend admin: auth.ts, session.ts, posts.ts, teachers.ts, stats.ts (query D1),
+│                           # require-auth.ts, env.ts
+├── pages/admin/           # Panel admin (login, posts/, teachers/, stats/) -- lihat Panel Admin di bawah
+├── components/            # komponen reusable (Navbar, Hero, NewsCard, TeacherCard, dst)
 ├── layouts/BaseLayout.astro, AdminLayout.astro
 ├── pages/                 # /, /profil, /akademik, /kegiatan, /berita, /informasi, /kontak
 ├── scripts/interactions.ts # reveal-on-scroll, count-up, navbar scroll, mobile menu (vanilla JS)
@@ -43,16 +43,16 @@ public/
 └── favicon.svg
 
 db/
-└── schema.sql            # skema Cloudflare D1 (users, sessions, posts) -- lihat db/README.md
+└── schema.sql            # skema Cloudflare D1 (users, sessions, posts, teachers, stats) -- lihat db/README.md
 ```
 
 ## Mengganti konten
 
-**Jangan edit komponen buat ganti teks/data.** Berita & Info diedit lewat panel admin
-(`/admin`, lihat di bawah). Konten lain masih statis, edit di `src/data/*.ts`:
+**Jangan edit komponen buat ganti teks/data.** Berita & Info, Guru & Tendik, dan
+Statistik beranda diedit lewat panel admin (`/admin`, lihat di bawah). Konten lain
+masih statis, edit di `src/data/*.ts`:
 
 - Ganti nama Kepala Sekolah, alamat, no. telepon, dst → `src/data/school.ts`
-- Tambah/ganti guru → `src/data/teachers.ts`
 - Tambah/ganti agenda → `src/data/events.ts`
 
 Semua nilai yang belum diketahui pasti ditulis `[Placeholder]` -- **cari `[...]` dan komentar
@@ -61,23 +61,33 @@ sekolah dikarang.
 
 ## Panel Admin
 
-Berita & pengumuman dikelola lewat `/admin` (login), disimpan di Cloudflare D1 --
-bukan lagi lewat file statis. Setelah login, isi/ubah/hapus berita di `/admin/posts`
-langsung tampil di `/`, `/berita`, dan `/informasi` (kategori "Pengumuman") tanpa
-perlu deploy ulang.
+Tiga jenis konten dikelola lewat `/admin` (login), disimpan di Cloudflare D1 --
+bukan lagi lewat file statis. Perubahan langsung tampil di situs publik tanpa
+perlu deploy ulang:
+
+- **`/admin/posts`** -- Berita & Pengumuman. Kategori: Prestasi, Akademik, Kegiatan,
+  Pengumuman, Sekolah. Status **Draft** vs **Publish** -- draft tidak tampil ke
+  publik sampai diubah ke Publish. Tampil di `/`, `/berita`, `/berita/<slug>`, dan
+  `/informasi` (kategori "Pengumuman").
+- **`/admin/teachers`** -- Guru & Tenaga Kependidikan (nama, jabatan, mapel, foto
+  opsional). Tampil di beranda (4 pertama) dan `/profil#guru` (semua).
+- **`/admin/stats`** -- kartu angka di beranda (jumlah siswa, guru, dst). Satu
+  halaman berisi semua baris, masing-masing punya tombol Simpan/Hapus sendiri,
+  plus form tambah baru di bawahnya.
+
+Belum ada upload file gambar (baik sampul berita maupun foto guru) -- kolom
+gambar cuma nerima **path/URL teks** (mis. `/images/news/foto.jpg`), jadi file
+fotonya sendiri masih harus ditaruh manual ke `public/images/...` lewat kode.
 
 - **URL login**: `https://<domain-situs>/admin/login`
 - **Akun awal**: username `admin`, password `Smpn20#2026` -- **segera ganti** lewat
   `db/README.md` (bagian "Membuat/reset akun admin"), jangan dipakai jangka panjang.
-- Kategori berita: Prestasi, Akademik, Kegiatan, Pengumuman, Sekolah.
-- Status **Draft** vs **Publish** -- draft tidak tampil di halaman publik sampai
-  diubah ke Publish.
 - Detail skema database, cara reset password, cara lihat isi database → `db/README.md`.
 
 Ini butuh Worker jalan (bukan situs statis murni lagi) -- karena itu proyek pakai
 adapter `@astrojs/cloudflare` dengan *hybrid rendering*: halaman yang butuh data admin
-terbaru (`/`, `/berita`, `/informasi`, semua `/admin/*`) di-render tiap request
-(`export const prerender = false`), sisanya (Profil, Akademik, Kegiatan, Kontak) tetap
+terbaru (`/`, `/profil`, `/berita`, `/informasi`, semua `/admin/*`) di-render tiap
+request (`export const prerender = false`), sisanya (Akademik, Kegiatan, Kontak) tetap
 statis penuh seperti sebelumnya.
 
 ## Build & deploy
@@ -103,9 +113,8 @@ npm run deploy      # build lalu wrangler deploy
 - [ ] `astro.config.mjs` → `site:` ganti ke domain asli
 - [ ] `wrangler.jsonc` → tambah `routes` custom domain begitu domain siap
 - [ ] `src/data/school.ts` → identitas sekolah asli (alamat, telepon, email, NPSN, sosial media)
-- [ ] `src/data/teachers.ts` → data guru asli + foto (`public/images/teachers/`)
 - [ ] Ganti password admin bawaan (`Smpn20#2026`) -- lihat `db/README.md`
-- [ ] Isi berita/info asli lewat `/admin` (bukan lagi file statis)
+- [ ] Isi berita/info, data guru & tendik, dan statistik asli lewat `/admin` (bukan lagi file statis)
 - [ ] `src/data/events.ts` → agenda asli
 - [ ] `src/data/gallery.ts` → foto kegiatan asli (`public/images/gallery/`)
 - [ ] `src/pages/profil.astro` → sejarah, visi, misi, struktur organisasi asli

@@ -1,0 +1,81 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import Icon from '../../../components/Icon.astro';
+import { requireAuth } from '../../../lib/require-auth';
+import { deleteTeacher, getTeachers } from '../../../lib/teachers';
+import { env } from '../../../lib/env';
+
+const auth = await requireAuth(Astro);
+if (auth instanceof Response) return auth;
+const user = auth;
+
+const db = env.DB;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  if (form.get('_action') === 'delete') {
+    const id = Number(form.get('id'));
+    if (id) await deleteTeacher(db, id);
+    return Astro.redirect('/admin/teachers');
+  }
+}
+
+const teachers = await getTeachers(db);
+---
+
+<AdminLayout title="Guru & Tendik" user={user}>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-extrabold">Guru & Tenaga Kependidikan</h1>
+      <p class="text-sm text-ink-soft">Direktori guru & tendik yang tampil di beranda dan halaman Profil.</p>
+    </div>
+    <a href="/admin/teachers/new" class="btn-primary">
+      <Icon name="sparkle" class="h-4 w-4" />
+      Tambah
+    </a>
+  </div>
+
+  <div class="mt-6 overflow-hidden rounded-2xl border border-border bg-white">
+    <table class="w-full text-left text-sm">
+      <thead class="border-b border-border bg-bg text-xs font-bold uppercase tracking-wide text-ink-faint">
+        <tr>
+          <th class="px-4 py-3">Nama</th>
+          <th class="px-4 py-3">Jabatan</th>
+          <th class="px-4 py-3">Mapel</th>
+          <th class="px-4 py-3">Urutan</th>
+          <th class="px-4 py-3 text-right">Aksi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border">
+        {teachers.length === 0 ? (
+          <tr><td colspan="5" class="px-4 py-10 text-center text-ink-faint">Belum ada data guru. Klik "Tambah" untuk mulai.</td></tr>
+        ) : (
+          teachers.map((t) => (
+            <tr>
+              <td class="px-4 py-3 font-semibold">{t.name}</td>
+              <td class="px-4 py-3 text-ink-soft">{t.position}</td>
+              <td class="px-4 py-3 text-ink-soft">{t.subject ?? '-'}</td>
+              <td class="px-4 py-3 text-ink-soft">{t.sort_order}</td>
+              <td class="px-4 py-3">
+                <div class="flex justify-end gap-2">
+                  <a href={`/admin/teachers/${t.id}/edit`} class="rounded-lg p-2 text-ink-soft hover:bg-bg hover:text-secondary" title="Edit">
+                    <Icon name="file" class="h-4 w-4" />
+                  </a>
+                  <form method="POST" onsubmit="return confirm('Hapus data guru ini? Tindakan ini tidak bisa dibatalkan.');">
+                    <input type="hidden" name="_action" value="delete" />
+                    <input type="hidden" name="id" value={t.id} />
+                    <button type="submit" class="rounded-lg p-2 text-ink-soft hover:bg-accent2-light hover:text-accent2-dark" title="Hapus">
+                      <Icon name="x" class="h-4 w-4" />
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

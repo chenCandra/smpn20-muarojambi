@@ -18,22 +18,23 @@ import ParentInfoCard from '../components/ParentInfoCard.astro';
 import CTASection from '../components/CTASection.astro';
 import Icon from '../components/Icon.astro';
 
-import { stats } from '../data/school';
 import { getPublishedPosts } from '../lib/posts';
+import { getStats } from '../lib/stats';
+import { getTeachers } from '../lib/teachers';
 import { env } from '../lib/env';
 import { events } from '../data/events';
 import { extracurriculars } from '../data/extracurriculars';
-import { teachers } from '../data/teachers';
 import { gallery } from '../data/gallery';
 import { fields } from '../data/fields';
 
 const db = env.DB;
 const beritaTerbaru = await getPublishedPosts(db, { limit: 3 });
+const stats = await getStats(db);
 const agendaMendatang = [...events]
   .filter((e) => new Date(e.date) >= new Date(new Date().toDateString()))
   .sort((a, b) => new Date(a.date).valueOf() - new Date(b.date).valueOf())
   .slice(0, 3);
-const guruPreview = teachers.slice(0, 4);
+const guruPreview = (await getTeachers(db)).slice(0, 4);
 
 const parentInfo = [
   { icon: 'megaphone', title: 'Pengumuman', description: 'Info terbaru untuk siswa & orang tua.', href: '/informasi#pengumuman' },

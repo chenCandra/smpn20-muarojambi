@@ -2,8 +2,9 @@
 
 Panel admin (`/admin`) disimpan di Cloudflare D1 (SQLite serverless), binding `DB`
 (lihat `wrangler.jsonc`). Skemanya di `schema.sql`: tabel `users` (akun admin),
-`sessions` (login, opaque token -- bukan JWT), dan `posts` (berita & info, satu
-tabel dibedakan lewat kolom `category`).
+`sessions` (login, opaque token -- bukan JWT), `posts` (berita & info, satu tabel
+dibedakan lewat kolom `category`), `teachers` (guru & tenaga kependidikan), dan
+`stats` (kartu angka di beranda).
 
 ## Menerapkan skema
 

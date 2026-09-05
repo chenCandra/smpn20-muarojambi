@@ -1,0 +1,44 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import TeacherForm from '../../../components/admin/TeacherForm.astro';
+import { requireAuth } from '../../../lib/require-auth';
+import { createTeacher, getTeachers } from '../../../lib/teachers';
+import { env } from '../../../lib/env';
+
+const auth = await requireAuth(Astro);
+if (auth instanceof Response) return auth;
+const user = auth;
+
+const db = env.DB;
+let error: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const name = String(form.get('name') ?? '').trim();
+  const position = String(form.get('position') ?? '').trim();
+
+  if (!name || !position) {
+    error = 'Nama dan Jabatan wajib diisi.';
+  } else {
+    await createTeacher(db, {
+      name,
+      position,
+      subject: String(form.get('subject') ?? '').trim() || null,
+      photo: String(form.get('photo') ?? '').trim() || null,
+      sort_order: Number(form.get('sort_order') ?? 0),
+    });
+    return Astro.redirect('/admin/teachers');
+  }
+}
+
+const existing = await getTeachers(db);
+---
+
+<AdminLayout title="Tambah Guru" user={user}>
+  <a href="/admin/teachers" class="text-sm font-semibold text-ink-soft hover:text-secondary">&larr; Guru & Tendik</a>
+  <h1 class="mt-2 text-2xl font-extrabold">Tambah Guru</h1>
+
+  <TeacherForm action="/admin/teachers/new" error={error} nextSortOrder={existing.length} />
+</AdminLayout>

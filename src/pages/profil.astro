@@ -1,10 +1,18 @@
 ---
+// Halaman ini sebelumnya statis penuh -- sekarang butuh prerender=false
+// karena daftar guru dibaca dari D1 (diedit lewat /admin/teachers), sama
+// alasannya kayak /berita.
+export const prerender = false;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import TeacherCard from '../components/TeacherCard.astro';
 import Icon from '../components/Icon.astro';
 import { school } from '../data/school';
-import { teachers } from '../data/teachers';
+import { getTeachers } from '../lib/teachers';
+import { env } from '../lib/env';
+
+const teachers = await getTeachers(env.DB);
 
 const misi = [
   'Menyelenggarakan pembelajaran yang aktif, kreatif, dan menyenangkan.',
@@ -99,10 +107,13 @@ const struktur = [
   <section id="guru" class="scroll-mt-20 bg-secondary-light/40 py-16 sm:py-20">
     <div class="container-page">
       <SectionHeading eyebrow="Tim Pendidik" title="Guru & Tenaga Kependidikan" align="center" />
-      <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        {teachers.map((t, i) => <TeacherCard teacher={t} delay={i * 50} />)}
-      </div>
-      <p class="reveal mt-8 text-center text-xs text-ink-faint">Data di atas contoh/placeholder -- lengkapi lewat berkas <code>src/data/teachers.ts</code>.</p>
+      {teachers.length === 0 ? (
+        <p class="mt-10 text-center text-sm text-ink-soft">Belum ada data guru. Tambah lewat <a href="/admin/teachers" class="font-semibold text-secondary">panel admin</a>.</p>
+      ) : (
+        <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {teachers.map((t, i) => <TeacherCard teacher={t} delay={i * 50} />)}
+        </div>
+      )}
     </div>
   </section>
 </BaseLayout>
