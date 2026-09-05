@@ -1,0 +1,103 @@
+---
+export const prerender = false;
+
+import Logo from '../../components/Logo.astro';
+import '../../styles/global.css';
+import { verifyPassword } from '../../lib/auth';
+import { createSession, getSessionUser, pruneExpiredSessions } from '../../lib/session';
+import { SESSION_COOKIE, SESSION_DURATION_MS } from '../../lib/auth';
+import { env } from '../../lib/env';
+
+const db = env.DB;
+
+// Sudah login? Langsung lempar ke dashboard, nggak perlu login ulang.
+const existingToken = Astro.cookies.get(SESSION_COOKIE)?.value;
+if (await getSessionUser(db, existingToken)) {
+  return Astro.redirect('/admin/posts');
+}
+
+const next = Astro.url.searchParams.get('next') ?? '/admin/posts';
+let error: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const username = String(form.get('username') ?? '').trim();
+  const password = String(form.get('password') ?? '');
+
+  const user = await db.prepare('SELECT id, password_hash FROM users WHERE username = ?').bind(username).first<{ id: number; password_hash: string }>();
+
+  if (user && (await verifyPassword(password, user.password_hash))) {
+    await pruneExpiredSessions(db);
+    const token = await createSession(db, user.id);
+
+    Astro.cookies.set(SESSION_COOKIE, token, {
+      path: '/',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: SESSION_DURATION_MS / 1000,
+    });
+
+    return Astro.redirect(next);
+  }
+
+  error = 'Username atau password salah.';
+}
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Masuk — Admin SMPN 20</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;0,800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="flex min-h-screen items-center justify-center bg-gradient-to-br from-secondary-light to-primary-light p-5">
+    <div class="w-full max-w-sm rounded-[var(--radius-card-lg)] border border-border bg-white p-8 shadow-xl">
+      <div class="flex flex-col items-center text-center">
+        <Logo size={48} />
+        <h1 class="mt-4 text-xl font-extrabold">Admin SMPN 20</h1>
+        <p class="mt-1 text-sm text-ink-soft">Masuk untuk mengelola berita & informasi situs.</p>
+      </div>
+
+      {error && (
+        <div class="mt-5 rounded-xl bg-accent2-light px-4 py-2.5 text-sm font-semibold text-accent2-dark">{error}</div>
+      )}
+
+      <form method="POST" class="mt-6 flex flex-col gap-4">
+        <div>
+          <label for="username" class="text-sm font-semibold">Username</label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            required
+            autofocus
+            autocomplete="username"
+            class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+          />
+        </div>
+        <div>
+          <label for="password" class="text-sm font-semibold">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            autocomplete="current-password"
+            class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+          />
+        </div>
+        <button type="submit" class="btn-primary mt-2 justify-center">Masuk</button>
+      </form>
+    </div>
+  </body>
+</html>

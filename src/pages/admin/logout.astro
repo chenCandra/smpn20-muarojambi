@@ -1,0 +1,16 @@
+---
+export const prerender = false;
+
+import { destroySession } from '../../lib/session';
+import { SESSION_COOKIE } from '../../lib/auth';
+import { env } from '../../lib/env';
+
+if (Astro.request.method === 'POST') {
+  const db = env.DB;
+  const token = Astro.cookies.get(SESSION_COOKIE)?.value;
+  await destroySession(db, token);
+  Astro.cookies.delete(SESSION_COOKIE, { path: '/' });
+}
+
+return Astro.redirect('/admin/login');
+---

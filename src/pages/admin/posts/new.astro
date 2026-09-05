@@ -1,0 +1,53 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import PostForm from '../../../components/admin/PostForm.astro';
+import { requireAuth } from '../../../lib/require-auth';
+import { createPost, ensureUniqueSlug, slugify, type PostCategory, type PostStatus } from '../../../lib/posts';
+import { env } from '../../../lib/env';
+
+const auth = await requireAuth(Astro);
+if (auth instanceof Response) return auth;
+const user = auth;
+
+const db = env.DB;
+let error: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const title = String(form.get('title') ?? '').trim();
+  const rawSlug = String(form.get('slug') ?? '').trim();
+
+  if (!title) {
+    error = 'Judul wajib diisi.';
+  } else {
+    const slug = await ensureUniqueSlug(db, slugify(rawSlug || title));
+
+    const id = await createPost(
+      db,
+      {
+        title,
+        slug,
+        excerpt: String(form.get('excerpt') ?? '').trim() || null,
+        content: String(form.get('content') ?? '').trim(),
+        category: String(form.get('category') ?? 'Sekolah') as PostCategory,
+        cover: String(form.get('cover') ?? '').trim() || null,
+        status: String(form.get('status') ?? 'draft') as PostStatus,
+        published_at: String(form.get('published_at') ?? new Date().toISOString().slice(0, 10)),
+      },
+      user.id
+    );
+
+    if (id) return Astro.redirect('/admin/posts');
+    error = 'Gagal menyimpan, silakan coba lagi.';
+  }
+}
+---
+
+<AdminLayout title="Tulis Berita Baru" user={user}>
+  <a href="/admin/posts" class="text-sm font-semibold text-ink-soft hover:text-secondary">&larr; Berita & Info</a>
+  <h1 class="mt-2 text-2xl font-extrabold">Tulis Berita Baru</h1>
+
+  <PostForm action="/admin/posts/new" error={error} />
+</AdminLayout>

@@ -1,0 +1,95 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import Icon from '../../../components/Icon.astro';
+import { requireAuth } from '../../../lib/require-auth';
+import { deletePost, getAllPostsAdmin } from '../../../lib/posts';
+import { env } from '../../../lib/env';
+
+const auth = await requireAuth(Astro);
+if (auth instanceof Response) return auth;
+const user = auth;
+
+const db = env.DB;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  if (form.get('_action') === 'delete') {
+    const id = Number(form.get('id'));
+    if (id) await deletePost(db, id);
+    return Astro.redirect('/admin/posts');
+  }
+}
+
+const posts = await getAllPostsAdmin(db);
+
+const categoryTone: Record<string, string> = {
+  Prestasi: 'bg-accent-light text-accent-dark',
+  Akademik: 'bg-primary-light text-primary-dark',
+  Kegiatan: 'bg-secondary-light text-secondary-dark',
+  Pengumuman: 'bg-accent2-light text-accent2-dark',
+  Sekolah: 'bg-slate-100 text-ink-soft',
+};
+---
+
+<AdminLayout title="Berita & Info" user={user}>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-extrabold">Berita & Info</h1>
+      <p class="text-sm text-ink-soft">Kelola berita, prestasi, agenda, dan pengumuman yang tampil di situs.</p>
+    </div>
+    <a href="/admin/posts/new" class="btn-primary">
+      <Icon name="sparkle" class="h-4 w-4" />
+      Tulis Baru
+    </a>
+  </div>
+
+  <div class="mt-6 overflow-hidden rounded-2xl border border-border bg-white">
+    <table class="w-full text-left text-sm">
+      <thead class="border-b border-border bg-bg text-xs font-bold uppercase tracking-wide text-ink-faint">
+        <tr>
+          <th class="px-4 py-3">Judul</th>
+          <th class="px-4 py-3">Kategori</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Tanggal</th>
+          <th class="px-4 py-3 text-right">Aksi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border">
+        {posts.length === 0 ? (
+          <tr><td colspan="5" class="px-4 py-10 text-center text-ink-faint">Belum ada berita/info. Klik "Tulis Baru" untuk mulai.</td></tr>
+        ) : (
+          posts.map((post) => (
+            <tr>
+              <td class="px-4 py-3 font-semibold">{post.title}</td>
+              <td class="px-4 py-3"><span class:list={['badge', categoryTone[post.category]]}>{post.category}</span></td>
+              <td class="px-4 py-3">
+                {post.status === 'published' ? (
+                  <span class="badge bg-primary-light text-primary-dark">Terbit</span>
+                ) : (
+                  <span class="badge bg-slate-100 text-ink-soft">Draf</span>
+                )}
+              </td>
+              <td class="px-4 py-3 text-ink-soft">{new Date(post.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+              <td class="px-4 py-3">
+                <div class="flex justify-end gap-2">
+                  <a href={`/admin/posts/${post.id}/edit`} class="rounded-lg p-2 text-ink-soft hover:bg-bg hover:text-secondary" title="Edit">
+                    <Icon name="file" class="h-4 w-4" />
+                  </a>
+                  <form method="POST" onsubmit="return confirm('Hapus berita ini? Tindakan ini tidak bisa dibatalkan.');">
+                    <input type="hidden" name="_action" value="delete" />
+                    <input type="hidden" name="id" value={post.id} />
+                    <button type="submit" class="rounded-lg p-2 text-ink-soft hover:bg-accent2-light hover:text-accent2-dark" title="Hapus">
+                      <Icon name="x" class="h-4 w-4" />
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

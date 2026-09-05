@@ -1,20 +1,23 @@
 ---
+export const prerender = false;
+
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
-import { news } from '../../data/news';
+import { getPublishedPostBySlug } from '../../lib/posts';
+import { env } from '../../lib/env';
 
-export function getStaticPaths() {
-  return news.map((article) => ({
-    params: { slug: article.slug },
-    props: { article },
-  }));
+const db = env.DB;
+const article = await getPublishedPostBySlug(db, Astro.params.slug!);
+
+if (!article) {
+  return Astro.redirect('/berita');
 }
 
-const { article } = Astro.props;
-const formattedDate = new Date(article.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+const formattedDate = new Date(article.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+const paragraphs = article.content.split(/\n\s*\n/).filter(Boolean);
 ---
 
-<BaseLayout title={article.title} description={article.excerpt} ogImage={article.cover ?? undefined}>
+<BaseLayout title={article.title} description={article.excerpt ?? undefined} ogImage={article.cover ?? undefined}>
   <article class="py-16 sm:py-20">
     <div class="container-page mx-auto max-w-2xl">
       <a href="/berita" class="reveal inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft hover:text-secondary">
@@ -37,7 +40,7 @@ const formattedDate = new Date(article.date).toLocaleDateString('id-ID', { day: 
       </div>
 
       <div class="reveal mt-8 flex flex-col gap-4 text-base leading-relaxed text-ink-soft [animation-delay:220ms]">
-        {article.content.map((p) => <p>{p}</p>)}
+        {paragraphs.map((p) => <p>{p}</p>)}
       </div>
     </div>
   </article>

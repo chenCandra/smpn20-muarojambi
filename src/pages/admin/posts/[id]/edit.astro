@@ -1,0 +1,55 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import PostForm from '../../../../components/admin/PostForm.astro';
+import { requireAuth } from '../../../../lib/require-auth';
+import { ensureUniqueSlug, getPostById, slugify, updatePost, type PostCategory, type PostStatus } from '../../../../lib/posts';
+import { env } from '../../../../lib/env';
+
+const auth = await requireAuth(Astro);
+if (auth instanceof Response) return auth;
+const user = auth;
+
+const db = env.DB;
+const id = Number(Astro.params.id);
+
+let post = await getPostById(db, id);
+if (!post) {
+  return Astro.redirect('/admin/posts');
+}
+
+let error: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const title = String(form.get('title') ?? '').trim();
+  const rawSlug = String(form.get('slug') ?? '').trim();
+
+  if (!title) {
+    error = 'Judul wajib diisi.';
+  } else {
+    const slug = await ensureUniqueSlug(db, slugify(rawSlug || title), id);
+
+    await updatePost(db, id, {
+      title,
+      slug,
+      excerpt: String(form.get('excerpt') ?? '').trim() || null,
+      content: String(form.get('content') ?? '').trim(),
+      category: String(form.get('category') ?? 'Sekolah') as PostCategory,
+      cover: String(form.get('cover') ?? '').trim() || null,
+      status: String(form.get('status') ?? 'draft') as PostStatus,
+      published_at: String(form.get('published_at') ?? post.published_at),
+    });
+
+    return Astro.redirect('/admin/posts');
+  }
+}
+---
+
+<AdminLayout title="Edit Berita" user={user}>
+  <a href="/admin/posts" class="text-sm font-semibold text-ink-soft hover:text-secondary">&larr; Berita & Info</a>
+  <h1 class="mt-2 text-2xl font-extrabold">Edit Berita</h1>
+
+  <PostForm post={post} action={`/admin/posts/${id}/edit`} error={error} />
+</AdminLayout>

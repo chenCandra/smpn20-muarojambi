@@ -1,12 +1,18 @@
 ---
+// Pengumuman dari D1 (kategori 'Pengumuman' di tabel posts, diisi lewat
+// /admin) -- prerender=false, sama alasannya kayak /berita.
+export const prerender = false;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import ParentInfoCard from '../components/ParentInfoCard.astro';
 import Icon from '../components/Icon.astro';
-import { news } from '../data/news';
+import { getPublishedPosts } from '../lib/posts';
 import { school } from '../data/school';
+import { env } from '../lib/env';
 
-const pengumuman = news.filter((n) => n.category === 'Pengumuman').sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf());
+const db = env.DB;
+const pengumuman = await getPublishedPosts(db, { category: 'Pengumuman' });
 
 const parentInfo = [
   { icon: 'megaphone', title: 'Pengumuman', description: 'Info terbaru untuk siswa & orang tua.', href: '#pengumuman' },
@@ -58,7 +64,7 @@ const syaratPpdb = [
               <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent2-light text-accent2-dark"><Icon name="megaphone" class="h-5 w-5" /></div>
               <div class="min-w-0">
                 <p class="text-sm font-bold">{p.title}</p>
-                <p class="text-xs text-ink-faint">{new Date(p.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <p class="text-xs text-ink-faint">{new Date(p.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
               </div>
               <Icon name="chevron-right" class="ml-auto h-4 w-4 shrink-0 text-ink-faint" />
             </a>

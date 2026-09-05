@@ -1,0 +1,139 @@
+---
+import type { Post, PostCategory } from '../../lib/posts';
+
+interface Props {
+  post?: Post | null;
+  action: string;
+  error?: string | null;
+}
+
+const { post = null, action, error = null } = Astro.props;
+
+const categories: PostCategory[] = ['Sekolah', 'Prestasi', 'Akademik', 'Kegiatan', 'Pengumuman'];
+const today = new Date().toISOString().slice(0, 10);
+---
+
+<form method="POST" action={action} class="mt-6 flex max-w-2xl flex-col gap-5">
+  {error && <div class="rounded-xl bg-accent2-light px-4 py-2.5 text-sm font-semibold text-accent2-dark">{error}</div>}
+
+  <div>
+    <label for="title" class="text-sm font-semibold">Judul</label>
+    <input
+      id="title"
+      name="title"
+      type="text"
+      required
+      value={post?.title}
+      class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+    />
+  </div>
+
+  <div>
+    <label for="slug" class="text-sm font-semibold">
+      Slug URL <span class="font-normal text-ink-faint">(otomatis dari judul, bisa diubah manual)</span>
+    </label>
+    <div class="mt-1.5 flex items-center gap-1 rounded-xl border border-border px-4 py-2.5 text-sm focus-within:border-secondary">
+      <span class="text-ink-faint">/berita/</span>
+      <input id="slug" name="slug" type="text" required value={post?.slug} class="w-full outline-none" />
+    </div>
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label for="category" class="text-sm font-semibold">Kategori</label>
+      <select id="category" name="category" class="mt-1.5 w-full rounded-xl border border-border bg-white px-4 py-2.5 text-sm outline-none focus:border-secondary">
+        {categories.map((c) => <option value={c} selected={post?.category === c}>{c}</option>)}
+      </select>
+    </div>
+    <div>
+      <label for="published_at" class="text-sm font-semibold">Tanggal Terbit</label>
+      <input
+        id="published_at"
+        name="published_at"
+        type="date"
+        required
+        value={post?.published_at ?? today}
+        class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+      />
+    </div>
+  </div>
+
+  <div>
+    <label for="excerpt" class="text-sm font-semibold">Ringkasan <span class="font-normal text-ink-faint">(tampil di daftar berita)</span></label>
+    <textarea
+      id="excerpt"
+      name="excerpt"
+      rows="2"
+      class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+    >{post?.excerpt}</textarea>
+  </div>
+
+  <div>
+    <label for="content" class="text-sm font-semibold">Isi Berita <span class="font-normal text-ink-faint">(pisahkan paragraf dengan baris kosong)</span></label>
+    <textarea
+      id="content"
+      name="content"
+      rows="10"
+      required
+      class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+    >{post?.content}</textarea>
+  </div>
+
+  <div>
+    <label for="cover" class="text-sm font-semibold">URL Gambar Sampul <span class="font-normal text-ink-faint">(opsional)</span></label>
+    <input
+      id="cover"
+      name="cover"
+      type="text"
+      value={post?.cover ?? ''}
+      placeholder="/images/news/nama-file.jpg"
+      class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+    />
+  </div>
+
+  <div>
+    <span class="text-sm font-semibold">Status</span>
+    <div class="mt-1.5 flex gap-4">
+      <label class="flex items-center gap-2 text-sm">
+        <input type="radio" name="status" value="draft" checked={!post || post.status === 'draft'} />
+        Draf (belum tampil ke publik)
+      </label>
+      <label class="flex items-center gap-2 text-sm">
+        <input type="radio" name="status" value="published" checked={post?.status === 'published'} />
+        Terbitkan
+      </label>
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+    <button type="submit" class="btn-primary">Simpan</button>
+    <a href="/admin/posts" class="btn-outline">Batal</a>
+  </div>
+</form>
+
+<script>
+  // Auto-isi slug dari judul -- CUMA kalau slug belum pernah diubah manual
+  // oleh user (dilacak lewat flag `slugTouched`), biar nggak nimpa slug
+  // yang sudah sengaja diedit begitu judul diketik ulang.
+  const titleInput = document.getElementById('title') as HTMLInputElement | null;
+  const slugInput = document.getElementById('slug') as HTMLInputElement | null;
+  let slugTouched = Boolean(slugInput?.value);
+
+  function slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  titleInput?.addEventListener('input', () => {
+    if (!slugTouched && slugInput) slugInput.value = slugify(titleInput.value);
+  });
+
+  slugInput?.addEventListener('input', () => {
+    slugTouched = true;
+  });
+</script>

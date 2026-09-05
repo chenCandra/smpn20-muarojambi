@@ -1,4 +1,9 @@
 ---
+// Beranda campur konten statis & dinamis (Berita dari D1) -- karena
+// Astro nggak bisa "prerender sebagian halaman", satu section dinamis
+// bikin SELURUH halaman ini SSR (bukan cuma cache-bust bagian berita-nya).
+export const prerender = false;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import SectionHeading from '../components/SectionHeading.astro';
@@ -14,14 +19,16 @@ import CTASection from '../components/CTASection.astro';
 import Icon from '../components/Icon.astro';
 
 import { stats } from '../data/school';
-import { news } from '../data/news';
+import { getPublishedPosts } from '../lib/posts';
+import { env } from '../lib/env';
 import { events } from '../data/events';
 import { extracurriculars } from '../data/extracurriculars';
 import { teachers } from '../data/teachers';
 import { gallery } from '../data/gallery';
 import { fields } from '../data/fields';
 
-const beritaTerbaru = [...news].sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf()).slice(0, 3);
+const db = env.DB;
+const beritaTerbaru = await getPublishedPosts(db, { limit: 3 });
 const agendaMendatang = [...events]
   .filter((e) => new Date(e.date) >= new Date(new Date().toDateString()))
   .sort((a, b) => new Date(a.date).valueOf() - new Date(b.date).valueOf())
@@ -88,9 +95,13 @@ const parentInfo = [
         <SectionHeading eyebrow="Info Sekolah" title="Stories from SMPN 20 📰" />
         <a href="/berita" class="btn-outline shrink-0">Lihat Semua Berita <Icon name="arrow-right" class="h-4 w-4" /></a>
       </div>
-      <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {beritaTerbaru.map((a) => <NewsCard article={a} />)}
-      </div>
+      {beritaTerbaru.length === 0 ? (
+        <p class="mt-10 text-sm text-ink-soft">Belum ada berita yang diterbitkan.</p>
+      ) : (
+        <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {beritaTerbaru.map((a) => <NewsCard article={a} />)}
+        </div>
+      )}
     </div>
   </section>
 

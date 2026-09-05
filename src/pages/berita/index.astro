@@ -1,11 +1,19 @@
 ---
+// Sebelumnya baca src/data/news.ts (statis) -- sekarang baca dari D1
+// (tabel `posts`, diisi lewat /admin), jadi WAJIB prerender=false biar
+// datanya query ulang tiap request, bukan dibekukan di waktu build.
+export const prerender = false;
+
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import NewsCard from '../../components/NewsCard.astro';
-import { news, type NewsCategory } from '../../data/news';
+import { getPublishedPosts } from '../../lib/posts';
+import type { PostCategory } from '../../lib/posts';
 import { school } from '../../data/school';
+import { env } from '../../lib/env';
 
-const kategoriList: NewsCategory[] = ['Prestasi', 'Akademik', 'Kegiatan', 'Pengumuman', 'Sekolah'];
-const artikel = [...news].sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf());
+const db = env.DB;
+const kategoriList: PostCategory[] = ['Prestasi', 'Akademik', 'Kegiatan', 'Pengumuman', 'Sekolah'];
+const artikel = await getPublishedPosts(db);
 ---
 
 <BaseLayout title="Berita" description={`Berita dan kabar terbaru ${school.fullName}.`}>
@@ -19,10 +27,8 @@ const artikel = [...news].sort((a, b) => new Date(b.date).valueOf() - new Date(a
 
   <section class="py-16 sm:py-20">
     <div class="container-page">
-      <!-- Filter kategori CLIENT-SIDE (bukan query-param server) -- situs
-           ini statis, tidak ada server buat memproses ?kategori=...,
-           jadi filternya cukup show/hide kartu lewat JS begitu tombol
-           diklik, tanpa reload halaman. -->
+      <!-- Filter kategori client-side (JS), bukan query-param server --
+           lihat catatan di skrip bawah. -->
       <div id="filterBar" class="reveal flex flex-wrap gap-2">
         <button type="button" data-filter="Semua" class="badge is-active bg-secondary text-white transition-colors">Semua</button>
         {kategoriList.map((k) => (
@@ -30,13 +36,17 @@ const artikel = [...news].sort((a, b) => new Date(b.date).valueOf() - new Date(a
         ))}
       </div>
 
-      <div id="newsGrid" class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {artikel.map((a) => (
-          <div data-category={a.category}>
-            <NewsCard article={a} />
-          </div>
-        ))}
-      </div>
+      {artikel.length === 0 ? (
+        <p class="mt-10 text-sm text-ink-soft">Belum ada berita yang diterbitkan. Tulis lewat <a href="/admin/posts" class="font-semibold text-secondary">panel admin</a>.</p>
+      ) : (
+        <div id="newsGrid" class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {artikel.map((a) => (
+            <div data-category={a.category}>
+              <NewsCard article={a} />
+            </div>
+          ))}
+        </div>
+      )}
       <p id="emptyNote" class="mt-10 hidden text-sm text-ink-soft">Belum ada berita pada kategori ini.</p>
     </div>
   </section>

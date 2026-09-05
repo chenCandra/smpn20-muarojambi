@@ -1,14 +1,36 @@
 {
   "name": "smpn20-muarojambi",
+  // "main" & "assets.binding" WAJIB buat mode SSR (@astrojs/cloudflare) --
+  // beda dari sebelumnya yang situs statis (assets.directory doang, tanpa
+  // worker script). Route dinamis (/admin, /berita, dst) ditangani worker,
+  // sisanya (halaman statis) disajikan langsung dari assets tanpa lewat
+  // worker. "main" pakai entrypoint stabil bawaan adapter (bukan path ke
+  // dist/_worker.js/index.js) -- path itu cuma ada SETELAH build selesai,
+  // jadi bikin astro build gagal (chicken-and-egg saat plugin Cloudflare
+  // memvalidasi "main" sebelum file itu sempat ditulis). Entrypoint ini
+  // yang otomatis delegasi ke output build yang benar di runtime.
+  "main": "@astrojs/cloudflare/entrypoints/server",
   "compatibility_date": "2026-01-01",
+  // "disable_nodejs_process_v2" WAJIB bareng nodejs_compat + @astrojs/cloudflare
+  // versi baru -- tanpa ini, halaman SSR balikin body "[object Object]"
+  // (bug kenal: polyfill process v2 bikin deteksi Node.js internal Astro
+  // salah nangkep environment, jadi Astro balikin AsyncIterable yang belum
+  // didukung workerd, bukan Response body biasa). Lihat
+  // https://github.com/withastro/astro/issues/14511
+  "compatibility_flags": ["nodejs_compat", "disable_nodejs_process_v2"],
   "workers_dev": true,
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "404-page"
-  }
-  // Domain kustom belum diisi -- begitu sudah ada domain (mis. dari
-  // Cloudflare Registrar atau dipindah DNS-nya ke Cloudflare), tambahkan:
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "smpn20-cms",
+      "database_id": "48ddc727-81bc-401e-a321-a87110e0cafb"
+    }
+  ]
+  // Domain kustom belum diisi -- begitu sudah ada domain, tambahkan:
   // "routes": [{ "pattern": "smpn20muarojambi.sch.id", "custom_domain": true }]
-  // Sebelum itu, situs tetap bisa diakses lewat subdomain gratis
-  // *.workers.dev yang otomatis aktif selama workers_dev: true.
 }
