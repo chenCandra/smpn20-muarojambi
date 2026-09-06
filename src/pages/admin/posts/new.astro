@@ -14,6 +14,15 @@ const user = auth;
 const db = env.DB;
 let error: string | null = null;
 
+// ?category=... -- shortcut "Pengumuman" (dan kategori lain) di sidebar
+// lewat /admin/posts/new?category=Pengumuman: kategori sudah kepilih dan
+// begitu selesai balik ke daftar yang sudah difilter, bukan daftar semua.
+const categoryParam = Astro.url.searchParams.get('category') as PostCategory | null;
+const validCategories: PostCategory[] = ['Prestasi', 'Akademik', 'Kegiatan', 'Pengumuman', 'Sekolah'];
+const activeCategory = categoryParam && validCategories.includes(categoryParam) ? categoryParam : null;
+const formAction = activeCategory ? `/admin/posts/new?category=${activeCategory}` : '/admin/posts/new';
+const backToList = activeCategory ? `/admin/posts?category=${activeCategory}` : '/admin/posts';
+
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   const title = String(form.get('title') ?? '').trim();
@@ -39,15 +48,15 @@ if (Astro.request.method === 'POST') {
       user.id
     );
 
-    if (id) return Astro.redirect('/admin/posts');
+    if (id) return Astro.redirect(backToList);
     error = 'Gagal menyimpan, silakan coba lagi.';
   }
 }
 ---
 
-<AdminLayout title="Tulis Berita Baru" user={user}>
-  <a href="/admin/posts" class="text-sm font-semibold text-ink-soft hover:text-secondary">&larr; Berita & Info</a>
-  <h1 class="mt-2 text-2xl font-extrabold">Tulis Berita Baru</h1>
+<AdminLayout title={activeCategory ? `Tambah ${activeCategory}` : 'Tulis Berita Baru'} user={user}>
+  <a href={backToList} class="text-sm font-semibold text-ink-soft hover:text-secondary">&larr; {activeCategory ?? 'Berita & Info'}</a>
+  <h1 class="mt-2 text-2xl font-extrabold">{activeCategory ? `Tambah ${activeCategory}` : 'Tulis Berita Baru'}</h1>
 
-  <PostForm action="/admin/posts/new" error={error} />
+  <PostForm action={formAction} error={error} defaultCategory={activeCategory} cancelHref={backToList} />
 </AdminLayout>

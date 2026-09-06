@@ -16,7 +16,7 @@ const sudahLewat = events.filter((e) => new Date(e.date) < now);
   <section class="bg-gradient-to-br from-secondary-light/60 to-accent-light/50 pb-16 pt-16 sm:pt-20">
     <div class="container-page reveal">
       <span class="badge bg-white text-secondary shadow-sm">Kalender & Kegiatan</span>
-      <h1 class="mt-4 text-3xl sm:text-4xl">What's Happening? 🎉</h1>
+      <h1 class="mt-4 text-3xl sm:text-4xl">Ada Apa Hari Ini? 🎉</h1>
       <p class="mt-3 max-w-xl text-ink-soft">Agenda kegiatan dan beragam ekstrakurikuler yang bisa diikuti siswa SMPN 20 Muaro Jambi.</p>
     </div>
   </section>
@@ -45,7 +45,7 @@ const sudahLewat = events.filter((e) => new Date(e.date) < now);
 
   <section class="bg-secondary-light/40 py-16 sm:py-20">
     <div class="container-page">
-      <SectionHeading eyebrow="Kegiatan Siswa" title="Find Your Passion ✨" subtitle="Temukan kegiatan yang membuatmu bersemangat." align="center" />
+      <SectionHeading eyebrow="Kegiatan Siswa" title="Temukan Minatmu ✨" subtitle="Temukan kegiatan yang membuatmu bersemangat." align="center" />
       <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {extracurriculars.map((e, i) => <ExtracurricularCard name={e.name} icon={e.icon} description={e.description} delay={i * 50} />)}
       </div>

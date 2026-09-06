@@ -5,9 +5,11 @@ interface Props {
   post?: Post | null;
   action: string;
   error?: string | null;
+  defaultCategory?: PostCategory | null;
+  cancelHref?: string;
 }
 
-const { post = null, action, error = null } = Astro.props;
+const { post = null, action, error = null, defaultCategory = null, cancelHref = '/admin/posts' } = Astro.props;
 
 const categories: PostCategory[] = ['Sekolah', 'Prestasi', 'Akademik', 'Kegiatan', 'Pengumuman'];
 const today = new Date().toISOString().slice(0, 10);
@@ -42,7 +44,7 @@ const today = new Date().toISOString().slice(0, 10);
     <div>
       <label for="category" class="text-sm font-semibold">Kategori</label>
       <select id="category" name="category" class="mt-1.5 w-full rounded-xl border border-border bg-white px-4 py-2.5 text-sm outline-none focus:border-secondary">
-        {categories.map((c) => <option value={c} selected={post?.category === c}>{c}</option>)}
+        {categories.map((c) => <option value={c} selected={(post?.category ?? defaultCategory) === c}>{c}</option>)}
       </select>
     </div>
     <div>
@@ -107,7 +109,7 @@ const today = new Date().toISOString().slice(0, 10);
 
   <div class="flex gap-3">
     <button type="submit" class="btn-primary">Simpan</button>
-    <a href="/admin/posts" class="btn-outline">Batal</a>
+    <a href={cancelHref} class="btn-outline">Batal</a>
   </div>
 </form>
 

@@ -64,3 +64,22 @@ CREATE TABLE IF NOT EXISTS teachers (
 );
 
 CREATE INDEX IF NOT EXISTS idx_teachers_sort ON teachers(sort_order);
+
+-- Setting teks bebas satu-satuan (key-value) -- dipakai buat paragraf info
+-- PPDB (key 'ppdb_intro') di /admin/ppdb. Generik biar bisa dipakai buat
+-- setting teks lain nanti tanpa perlu tabel baru tiap kali.
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Daftar syarat pendaftaran PPDB -- sebelumnya array `syaratPpdb` hardcode
+-- di src/pages/informasi.astro, sekarang diedit lewat /admin/ppdb.
+CREATE TABLE IF NOT EXISTS ppdb_requirements (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  text TEXT NOT NULL,
+  sort_order INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_ppdb_requirements_sort ON ppdb_requirements(sort_order);

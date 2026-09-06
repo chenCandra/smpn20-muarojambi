@@ -4,7 +4,7 @@ export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import Icon from '../../../components/Icon.astro';
 import { requireAuth } from '../../../lib/require-auth';
-import { deletePost, getAllPostsAdmin } from '../../../lib/posts';
+import { deletePost, getAllPostsAdmin, type PostCategory } from '../../../lib/posts';
 import { env } from '../../../lib/env';
 
 const auth = await requireAuth(Astro);
@@ -13,16 +13,25 @@ const user = auth;
 
 const db = env.DB;
 
+// Filter opsional lewat ?category=... -- dipakai shortcut "Pengumuman" di
+// sidebar (lihat AdminLayout.astro) supaya nggak perlu halaman/tabel
+// terpisah buat satu kategori yang sama modelnya dgn berita/prestasi/dll.
+const categoryParam = Astro.url.searchParams.get('category') as PostCategory | null;
+const validCategories: PostCategory[] = ['Prestasi', 'Akademik', 'Kegiatan', 'Pengumuman', 'Sekolah'];
+const activeCategory = categoryParam && validCategories.includes(categoryParam) ? categoryParam : null;
+const backToList = activeCategory ? `/admin/posts?category=${activeCategory}` : '/admin/posts';
+const newPostHref = activeCategory ? `/admin/posts/new?category=${activeCategory}` : '/admin/posts/new';
+
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   if (form.get('_action') === 'delete') {
     const id = Number(form.get('id'));
     if (id) await deletePost(db, id);
-    return Astro.redirect('/admin/posts');
+    return Astro.redirect(backToList);
   }
 }
 
-const posts = await getAllPostsAdmin(db);
+const posts = await getAllPostsAdmin(db, activeCategory ?? undefined);
 
 const categoryTone: Record<string, string> = {
   Prestasi: 'bg-accent-light text-accent-dark',
@@ -31,15 +40,23 @@ const categoryTone: Record<string, string> = {
   Pengumuman: 'bg-accent2-light text-accent2-dark',
   Sekolah: 'bg-slate-100 text-ink-soft',
 };
+
+const pageTitle = activeCategory ?? 'Berita & Info';
+const emptyText = activeCategory
+  ? `Belum ada ${activeCategory.toLowerCase()}. Klik "Tulis Baru" untuk mulai.`
+  : 'Belum ada berita/info. Klik "Tulis Baru" untuk mulai.';
 ---
 
-<AdminLayout title="Berita & Info" user={user}>
+<AdminLayout title={pageTitle} user={user}>
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 class="text-2xl font-extrabold">Berita & Info</h1>
-      <p class="text-sm text-ink-soft">Kelola berita, prestasi, agenda, dan pengumuman yang tampil di situs.</p>
+      {activeCategory && <a href="/admin/posts" class="text-sm font-semibold text-ink-soft hover:text-primary">&larr; Semua Berita & Info</a>}
+      <h1 class="mt-1 text-2xl font-extrabold">{pageTitle}</h1>
+      <p class="text-sm text-ink-soft">
+        {activeCategory ? `Kelola ${activeCategory.toLowerCase()} yang tampil di situs.` : 'Kelola berita, prestasi, agenda, dan pengumuman yang tampil di situs.'}
+      </p>
     </div>
-    <a href="/admin/posts/new" class="btn-primary">
+    <a href={newPostHref} class="btn-primary">
       <Icon name="sparkle" class="h-4 w-4" />
       Tulis Baru
     </a>
@@ -58,7 +75,7 @@ const categoryTone: Record<string, string> = {
       </thead>
       <tbody class="divide-y divide-border">
         {posts.length === 0 ? (
-          <tr><td colspan="5" class="px-4 py-10 text-center text-ink-faint">Belum ada berita/info. Klik "Tulis Baru" untuk mulai.</td></tr>
+          <tr><td colspan="5" class="px-4 py-10 text-center text-ink-faint">{emptyText}</td></tr>
         ) : (
           posts.map((post) => (
             <tr>

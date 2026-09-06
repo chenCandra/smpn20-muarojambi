@@ -1,0 +1,151 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import Icon from '../../../components/Icon.astro';
+import { requireAuth } from '../../../lib/require-auth';
+import { getSetting, setSetting } from '../../../lib/settings';
+import { createPpdbRequirement, deletePpdbRequirement, getPpdbRequirements, updatePpdbRequirement } from '../../../lib/ppdb';
+import { env } from '../../../lib/env';
+
+const auth = await requireAuth(Astro);
+if (auth instanceof Response) return auth;
+const user = auth;
+
+const db = env.DB;
+let error: string | null = null;
+
+const PPDB_INTRO_KEY = 'ppdb_intro';
+const PPDB_INTRO_FALLBACK = `Jadwal dan alur pendaftaran PPDB tahun ajaran berjalan akan diumumkan di halaman ini. Silakan pantau secara berkala, atau hubungi sekolah langsung untuk informasi terbaru.
+
+Mengikuti ketentuan Sistem Penerimaan Murid Baru (SPMB) yang ditetapkan Pemerintah Kabupaten/Provinsi, umumnya meliputi jalur zonasi, afirmasi, perpindahan tugas orang tua, dan prestasi.`;
+
+// Dua bagian di satu halaman: paragraf info (tabel settings key-value) +
+// daftar syarat (tabel ppdb_requirements, list -- sama polanya kayak
+// /admin/stats: form per baris, dibedakan `_action`).
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const action = form.get('_action');
+
+  if (action === 'save-intro') {
+    const intro = String(form.get('intro') ?? '').trim();
+    await setSetting(db, PPDB_INTRO_KEY, intro);
+    return Astro.redirect('/admin/ppdb');
+  }
+
+  if (action === 'delete') {
+    const id = Number(form.get('id'));
+    if (id) await deletePpdbRequirement(db, id);
+    return Astro.redirect('/admin/ppdb');
+  }
+
+  if (action === 'update' || action === 'create') {
+    const text = String(form.get('text') ?? '').trim();
+    const sortOrder = Number(form.get('sort_order') ?? 0);
+
+    if (!text) {
+      error = 'Teks syarat wajib diisi.';
+    } else if (action === 'update') {
+      const id = Number(form.get('id'));
+      await updatePpdbRequirement(db, id, { text, sort_order: sortOrder });
+      return Astro.redirect('/admin/ppdb');
+    } else {
+      await createPpdbRequirement(db, { text, sort_order: sortOrder });
+      return Astro.redirect('/admin/ppdb');
+    }
+  }
+}
+
+const intro = await getSetting(db, PPDB_INTRO_KEY, PPDB_INTRO_FALLBACK);
+const requirements = await getPpdbRequirements(db);
+---
+
+<AdminLayout title="PPDB" user={user}>
+  <h1 class="text-2xl font-extrabold">Penerimaan Peserta Didik Baru (PPDB)</h1>
+  <p class="text-sm text-ink-soft">Info ini tampil di <code>/informasi#ppdb</code>.</p>
+
+  {error && <div class="mt-4 max-w-2xl rounded-xl bg-accent2-light px-4 py-2.5 text-sm font-semibold text-accent2-dark">{error}</div>}
+
+  <div class="mt-6 max-w-2xl rounded-2xl border border-border bg-white p-5">
+    <h2 class="text-sm font-bold">Info Jadwal &amp; Jalur Pendaftaran</h2>
+    <p class="mt-1 text-xs text-ink-faint">Pisahkan paragraf dengan baris kosong, sama seperti isi berita.</p>
+    <form method="POST" class="mt-3">
+      <input type="hidden" name="_action" value="save-intro" />
+      <textarea
+        name="intro"
+        rows="6"
+        class="w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+      >{intro}</textarea>
+      <button type="submit" class="btn-primary mt-3">Simpan</button>
+    </form>
+  </div>
+
+  <h2 class="mt-8 text-sm font-bold">Syarat Umum Pendaftaran</h2>
+  <p class="text-xs text-ink-faint">Urutan tampil ditentukan kolom "Urutan" (kecil dulu).</p>
+
+  <div class="mt-3 overflow-hidden rounded-2xl border border-border bg-white">
+    <table class="w-full text-left text-sm">
+      <thead class="border-b border-border bg-bg text-xs font-bold uppercase tracking-wide text-ink-faint">
+        <tr>
+          <th class="px-4 py-3">Syarat</th>
+          <th class="px-4 py-3">Urutan</th>
+          <th class="px-4 py-3 text-right">Aksi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border">
+        {requirements.length === 0 ? (
+          <tr><td colspan="3" class="px-4 py-10 text-center text-ink-faint">Belum ada syarat. Tambah lewat form di bawah.</td></tr>
+        ) : (
+          requirements.map((r) => (
+            <tr>
+              <td colspan="3" class="p-0">
+                <div class="flex flex-wrap items-center gap-2 px-4 py-2.5">
+                  <form method="POST" class="flex flex-1 flex-wrap items-center gap-2">
+                    <input type="hidden" name="_action" value="update" />
+                    <input type="hidden" name="id" value={r.id} />
+                    <input
+                      name="text"
+                      value={r.text}
+                      required
+                      class="min-w-[14rem] flex-1 rounded-lg border border-border px-3 py-1.5 text-sm outline-none focus:border-secondary"
+                    />
+                    <input
+                      name="sort_order"
+                      type="number"
+                      value={r.sort_order}
+                      class="w-20 rounded-lg border border-border px-3 py-1.5 text-sm outline-none focus:border-secondary"
+                    />
+                    <button type="submit" class="rounded-lg px-3 py-1.5 text-sm font-semibold text-secondary hover:bg-bg">Simpan</button>
+                  </form>
+                  <form method="POST" onsubmit="return confirm('Hapus syarat ini?');">
+                    <input type="hidden" name="_action" value="delete" />
+                    <input type="hidden" name="id" value={r.id} />
+                    <button type="submit" class="rounded-lg p-1.5 text-ink-soft hover:bg-accent2-light hover:text-accent2-dark" title="Hapus">
+                      <Icon name="x" class="h-4 w-4" />
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-6 max-w-2xl rounded-2xl border border-border bg-white p-5">
+    <h2 class="text-sm font-bold">Tambah Syarat Baru</h2>
+    <form method="POST" class="mt-3 flex flex-wrap items-end gap-2">
+      <input type="hidden" name="_action" value="create" />
+      <div class="flex-1 min-w-[14rem]">
+        <label class="text-xs font-semibold text-ink-faint">Syarat</label>
+        <input name="text" required placeholder="mis. Fotokopi Kartu Keluarga (KK)" class="mt-1 w-full rounded-lg border border-border px-3 py-1.5 text-sm outline-none focus:border-secondary" />
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-ink-faint">Urutan</label>
+        <input name="sort_order" type="number" value={requirements.length} class="mt-1 w-20 rounded-lg border border-border px-3 py-1.5 text-sm outline-none focus:border-secondary" />
+      </div>
+      <button type="submit" class="btn-primary">Tambah</button>
+    </form>
+  </div>
+</AdminLayout>

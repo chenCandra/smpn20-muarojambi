@@ -86,8 +86,12 @@ export async function getPublishedPostBySlug(db: D1Database, slug: string): Prom
   return row ?? null;
 }
 
-export async function getAllPostsAdmin(db: D1Database): Promise<Post[]> {
-  const result = await db.prepare('SELECT * FROM posts ORDER BY created_at DESC, id DESC').all<Post>();
+export async function getAllPostsAdmin(db: D1Database, category?: PostCategory): Promise<Post[]> {
+  const query = category
+    ? 'SELECT * FROM posts WHERE category = ? ORDER BY created_at DESC, id DESC'
+    : 'SELECT * FROM posts ORDER BY created_at DESC, id DESC';
+  const stmt = category ? db.prepare(query).bind(category) : db.prepare(query);
+  const result = await stmt.all<Post>();
   return result.results ?? [];
 }
 
