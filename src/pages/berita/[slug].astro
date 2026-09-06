@@ -3,7 +3,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
-import { getPublishedPostBySlug } from '../../lib/posts';
+import { getPublishedPostBySlug, parseContentBlocks } from '../../lib/posts';
 import { env } from '../../lib/env';
 
 const db = env.DB;
@@ -14,7 +14,7 @@ if (!article) {
 }
 
 const formattedDate = new Date(article.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-const paragraphs = article.content.split(/\n\s*\n/).filter(Boolean);
+const blocks = parseContentBlocks(article.content);
 ---
 
 <BaseLayout title={article.title} description={article.excerpt ?? undefined} ogImage={article.cover ?? undefined}>
@@ -40,7 +40,13 @@ const paragraphs = article.content.split(/\n\s*\n/).filter(Boolean);
       </div>
 
       <div class="reveal mt-8 flex flex-col gap-4 text-base leading-relaxed text-ink-soft [animation-delay:220ms]">
-        {paragraphs.map((p) => <p>{p}</p>)}
+        {blocks.map((b) =>
+          b.type === 'image' ? (
+            <img src={b.src} alt={b.alt} loading="lazy" class="w-full rounded-[var(--radius-card)] object-cover" />
+          ) : (
+            <p>{b.text}</p>
+          )
+        )}
       </div>
     </div>
   </article>

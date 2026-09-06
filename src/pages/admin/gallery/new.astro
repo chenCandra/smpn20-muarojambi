@@ -1,0 +1,44 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import GalleryForm from '../../../components/admin/GalleryForm.astro';
+import { requireAuth } from '../../../lib/require-auth';
+import { createGalleryPhoto, getGalleryPhotos, type GalleryPhotoSize } from '../../../lib/gallery';
+import { env } from '../../../lib/env';
+
+const auth = await requireAuth(Astro);
+if (auth instanceof Response) return auth;
+const user = auth;
+
+const db = env.DB;
+let error: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const src = String(form.get('src') ?? '').trim();
+  const alt = String(form.get('alt') ?? '').trim();
+
+  if (!src || !alt) {
+    error = 'URL Foto dan Teks Alternatif wajib diisi.';
+  } else {
+    await createGalleryPhoto(db, {
+      src,
+      alt,
+      caption: String(form.get('caption') ?? '').trim() || null,
+      size: String(form.get('size') ?? 'landscape') as GalleryPhotoSize,
+      sort_order: Number(form.get('sort_order') ?? 0),
+    });
+    return Astro.redirect('/admin/gallery');
+  }
+}
+
+const existing = await getGalleryPhotos(db);
+---
+
+<AdminLayout title="Tambah Foto" user={user}>
+  <a href="/admin/gallery" class="text-sm font-semibold text-ink-soft hover:text-secondary">&larr; Galeri</a>
+  <h1 class="mt-2 text-2xl font-extrabold">Tambah Foto</h1>
+
+  <GalleryForm action="/admin/gallery/new" error={error} nextSortOrder={existing.length} />
+</AdminLayout>

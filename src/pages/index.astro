@@ -21,15 +21,16 @@ import Icon from '../components/Icon.astro';
 import { getPublishedPosts } from '../lib/posts';
 import { getStats } from '../lib/stats';
 import { getTeachers } from '../lib/teachers';
+import { getGalleryPhotos } from '../lib/gallery';
 import { env } from '../lib/env';
 import { events } from '../data/events';
 import { extracurriculars } from '../data/extracurriculars';
-import { gallery } from '../data/gallery';
 import { fields } from '../data/fields';
 
 const db = env.DB;
 const beritaTerbaru = await getPublishedPosts(db, { limit: 3 });
 const stats = await getStats(db);
+const gallery = await getGalleryPhotos(db);
 const agendaMendatang = [...events]
   .filter((e) => new Date(e.date) >= new Date(new Date().toDateString()))
   .sort((a, b) => new Date(a.date).valueOf() - new Date(b.date).valueOf())
@@ -144,9 +145,13 @@ const parentInfo = [
   <section class="py-16 sm:py-20">
     <div class="container-page">
       <SectionHeading eyebrow="Dokumentasi" title="Moments at SMPN 20 📸" align="center" />
-      <div class="mt-10">
-        <GalleryGrid photos={gallery} />
-      </div>
+      {gallery.length === 0 ? (
+        <p class="mt-10 text-center text-sm text-ink-soft">Belum ada foto galeri. Tambah lewat <a href="/admin/gallery" class="font-semibold text-secondary">panel admin</a>.</p>
+      ) : (
+        <div class="mt-10">
+          <GalleryGrid photos={gallery} />
+        </div>
+      )}
     </div>
   </section>
 

@@ -79,6 +79,10 @@ const today = new Date().toISOString().slice(0, 10);
       required
       class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
     >{post?.content}</textarea>
+    <p class="mt-1.5 text-xs text-ink-faint">
+      Mau sisipkan gambar di tengah tulisan? Tulis di baris sendiri (dikelilingi baris kosong):
+      <code class="rounded bg-bg px-1 py-0.5">![keterangan gambar](url-gambar)</code>
+    </p>
   </div>
 
   <div>

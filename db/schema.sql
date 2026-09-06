@@ -83,3 +83,16 @@ CREATE TABLE IF NOT EXISTS ppdb_requirements (
 );
 
 CREATE INDEX IF NOT EXISTS idx_ppdb_requirements_sort ON ppdb_requirements(sort_order);
+
+-- Galeri foto -- sebelumnya src/data/gallery.ts, sekarang diedit lewat
+-- /admin/gallery. Dipakai di galeri Hero (beranda) & "Moments at SMPN 20".
+CREATE TABLE IF NOT EXISTS gallery (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  src TEXT NOT NULL, -- path/URL foto, teks link (bukan upload file)
+  alt TEXT NOT NULL,
+  caption TEXT,
+  size TEXT NOT NULL DEFAULT 'landscape' CHECK (size IN ('landscape', 'portrait', 'square')),
+  sort_order INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_gallery_sort ON gallery(sort_order);

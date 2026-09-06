@@ -27,6 +27,28 @@ export interface PostInput {
   published_at: string;
 }
 
+// Isi berita ditulis paragraf-per-paragraf (dipisah baris kosong). Satu
+// baris yang isinya CUMA `![keterangan](url-gambar)` dianggap gambar
+// tersisip, bukan teks biasa -- format Markdown-image yang sederhana,
+// tanpa perlu rich-text editor. Dipakai di halaman detail berita.
+export type ContentBlock = { type: 'text'; text: string } | { type: 'image'; src: string; alt: string };
+
+const IMAGE_LINE = /^!\[(.*)\]\((\S+)\)$/;
+
+export function parseContentBlocks(content: string): ContentBlock[] {
+  return content
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block): ContentBlock => {
+      const match = block.match(IMAGE_LINE);
+      if (match) {
+        return { type: 'image', alt: match[1], src: match[2] };
+      }
+      return { type: 'text', text: block };
+    });
+}
+
 export function slugify(title: string): string {
   return title
     .toLowerCase()

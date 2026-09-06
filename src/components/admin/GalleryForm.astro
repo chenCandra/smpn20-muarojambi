@@ -1,0 +1,84 @@
+---
+import type { GalleryPhoto, GalleryPhotoSize } from '../../lib/gallery';
+
+interface Props {
+  photo?: GalleryPhoto | null;
+  action: string;
+  error?: string | null;
+  nextSortOrder: number;
+}
+
+const { photo = null, action, error = null, nextSortOrder } = Astro.props;
+
+const sizes: { value: GalleryPhotoSize; label: string }[] = [
+  { value: 'landscape', label: 'Landscape (lebar)' },
+  { value: 'portrait', label: 'Portrait (tinggi)' },
+  { value: 'square', label: 'Persegi' },
+];
+---
+
+<form method="POST" action={action} class="mt-6 flex max-w-2xl flex-col gap-5">
+  {error && <div class="rounded-xl bg-accent2-light px-4 py-2.5 text-sm font-semibold text-accent2-dark">{error}</div>}
+
+  <div>
+    <label for="src" class="text-sm font-semibold">URL Foto</label>
+    <input
+      id="src"
+      name="src"
+      type="text"
+      required
+      value={photo?.src}
+      placeholder="/images/gallery/nama-file.jpg"
+      class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+    />
+  </div>
+
+  <div>
+    <label for="caption" class="text-sm font-semibold">Keterangan <span class="font-normal text-ink-faint">(tampil saat hover)</span></label>
+    <input
+      id="caption"
+      name="caption"
+      type="text"
+      value={photo?.caption ?? ''}
+      placeholder="mis. Upacara Bendera"
+      class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+    />
+  </div>
+
+  <div>
+    <label for="alt" class="text-sm font-semibold">Teks Alternatif <span class="font-normal text-ink-faint">(buat aksesibilitas & SEO)</span></label>
+    <input
+      id="alt"
+      name="alt"
+      type="text"
+      required
+      value={photo?.alt}
+      placeholder="mis. Kegiatan upacara bendera hari Senin"
+      class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+    />
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label for="size" class="text-sm font-semibold">Orientasi</label>
+      <select id="size" name="size" class="mt-1.5 w-full rounded-xl border border-border bg-white px-4 py-2.5 text-sm outline-none focus:border-secondary">
+        {sizes.map((s) => <option value={s.value} selected={(photo?.size ?? 'landscape') === s.value}>{s.label}</option>)}
+      </select>
+    </div>
+    <div>
+      <label for="sort_order" class="text-sm font-semibold">Urutan Tampil</label>
+      <input
+        id="sort_order"
+        name="sort_order"
+        type="number"
+        value={photo?.sort_order ?? nextSortOrder}
+        class="mt-1.5 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-secondary"
+      />
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+    <button type="submit" class="btn-primary">Simpan</button>
+    <a href="/admin/gallery" class="btn-outline">Batal</a>
+  </div>
+</form>
