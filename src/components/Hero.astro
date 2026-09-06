@@ -1,6 +1,13 @@
 ---
+// Box foto kanan -- kalau ada foto asli di gallery.ts (src terisi),
+// tampil bergantian otomatis pelan (crossfade, BUKAN carousel geser
+// berat) + titik navigasi manual. Kalau belum ada foto sama sekali,
+// tetap placeholder jujur seperti sebelumnya (bukan gambar kosong/rusak).
 import Icon from './Icon.astro';
 import DecorativeSpace from './DecorativeSpace.astro';
+import { gallery } from '../data/gallery';
+
+const heroPhotos = gallery.filter((p) => p.src).slice(0, 5);
 ---
 
 <section class="relative overflow-hidden bg-gradient-to-br from-secondary via-secondary to-primary-dark pt-14 pb-24 sm:pt-20 sm:pb-32">
@@ -34,13 +41,39 @@ import DecorativeSpace from './DecorativeSpace.astro';
 
     <div class="reveal relative mx-auto aspect-[4/3] w-full max-w-lg [animation-delay:150ms]">
       <div class="absolute inset-0 rounded-[var(--radius-card-lg)] bg-white/10 ring-1 ring-white/20 backdrop-blur-sm"></div>
-      <div class="absolute inset-3 flex items-center justify-center overflow-hidden rounded-[calc(var(--radius-card-lg)-6px)] bg-white/5">
-        <!-- TODO: ganti dengan foto kegiatan siswa asli di public/images/hero/ -->
-        <div class="flex flex-col items-center gap-2 text-white/60">
-          <Icon name="graduation-cap" class="h-14 w-14" />
-          <span class="text-sm font-medium">Foto kegiatan siswa segera hadir</span>
+      {heroPhotos.length > 0 ? (
+        <div data-hero-gallery class="absolute inset-3 overflow-hidden rounded-[calc(var(--radius-card-lg)-6px)] bg-white/5">
+          {heroPhotos.map((photo, i) => (
+            <img
+              src={photo.src}
+              alt={photo.alt}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              class:list={['absolute inset-0 h-full w-full object-cover transition-opacity duration-1000', i === 0 ? 'opacity-100' : 'opacity-0']}
+              data-hero-gallery-slide
+            />
+          ))}
+          {heroPhotos.length > 1 && (
+            <div class="absolute inset-x-0 bottom-3 flex justify-center gap-1.5">
+              {heroPhotos.map((_, i) => (
+                <button
+                  type="button"
+                  data-hero-gallery-dot
+                  aria-label={`Foto ${i + 1}`}
+                  class:list={['h-2 w-2 rounded-full transition-all', i === 0 ? 'w-5 bg-white' : 'bg-white/40 hover:bg-white/70']}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      </div>
+      ) : (
+        <div class="absolute inset-3 flex items-center justify-center overflow-hidden rounded-[calc(var(--radius-card-lg)-6px)] bg-white/5">
+          <!-- TODO: ganti dengan foto kegiatan siswa asli -- isi src di src/data/gallery.ts, box ini otomatis jadi galeri bergantian. -->
+          <div class="flex flex-col items-center gap-2 text-white/60">
+            <Icon name="graduation-cap" class="h-14 w-14" />
+            <span class="text-sm font-medium">Foto kegiatan siswa segera hadir</span>
+          </div>
+        </div>
+      )}
       <span class="absolute -right-4 -top-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent text-ink shadow-lg animate-float">
         <Icon name="star" class="h-7 w-7" />
       </span>
@@ -54,3 +87,54 @@ import DecorativeSpace from './DecorativeSpace.astro';
     <path d="M0,32 C240,74 480,0 720,20 C960,40 1200,64 1440,20 L1440,74 L0,74 Z" fill="currentColor" />
   </svg>
 </section>
+
+<script>
+  // Galeri foto Hero -- gonta-ganti otomatis pelan (crossfade 5 detik),
+  // TIDAK jalan kalau cuma 1 foto atau user minta prefers-reduced-motion
+  // (titik navigasi manual tetap berfungsi). Jeda sebentar kalau
+  // pointer/keyboard fokus di dalam box (biar nggak "kabur" pas mau diklik).
+  const galleryEl = document.querySelector<HTMLElement>('[data-hero-gallery]');
+  if (galleryEl) {
+    const slides = Array.from(galleryEl.querySelectorAll<HTMLElement>('[data-hero-gallery-slide]'));
+    const dots = Array.from(galleryEl.querySelectorAll<HTMLButtonElement>('[data-hero-gallery-dot]'));
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let current = 0;
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    const show = (index: number) => {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((s, i) => s.classList.toggle('opacity-100', i === current));
+      slides.forEach((s, i) => s.classList.toggle('opacity-0', i !== current));
+      dots.forEach((d, i) => {
+        d.classList.toggle('w-5', i === current);
+        d.classList.toggle('bg-white', i === current);
+        d.classList.toggle('w-2', i !== current);
+        d.classList.toggle('bg-white/40', i !== current);
+      });
+    };
+
+    const start = () => {
+      if (prefersReducedMotion || slides.length < 2) return;
+      timer = setInterval(() => show(current + 1), 5000);
+    };
+    const stop = () => {
+      if (timer) clearInterval(timer);
+      timer = null;
+    };
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        show(i);
+        stop();
+        start();
+      });
+    });
+
+    galleryEl.addEventListener('mouseenter', stop);
+    galleryEl.addEventListener('mouseleave', start);
+    galleryEl.addEventListener('focusin', stop);
+    galleryEl.addEventListener('focusout', start);
+
+    start();
+  }
+</script>
